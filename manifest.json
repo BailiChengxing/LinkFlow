@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "清链助手",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "批量提取与清洗文本中的 URL，极简、高效、无广告。",
   "browser_specific_settings": {
     "gecko": {

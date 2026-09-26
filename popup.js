@@ -35,19 +35,18 @@ document.addEventListener('DOMContentLoaded', () => {
     lines.forEach(line => {
       if (!line.trim()) return;
 
-      // 1. 标准 URL 正则（匹配带有 http/https 或常用域名结构的字符串）
-      const standardRegex = /(https?:\/\/[^\s\u4e00-\u9fa5<>"'{}|\\^`\[\]]+|[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+[^\s\u4e00-\u9fa5<>"'{}|\\^`\[\]]*)/gi;
-      const directMatches = line.match(standardRegex);
+      // 1. 先整体移除字符串中的所有中文字符（解决插入“删”、“中”、“文”防封混淆）
+      const sanitizedLine = line.replace(/[\u4e00-\u9fa5]+/g, '');
 
-      if (directMatches) {
-        directMatches.forEach(url => extractedSet.add(cleanUrl(url)));
-      } else {
-        // 2. 混淆链接容错：去除文本中间夹杂的中文字符（如“删”、“中”、“文”等防封字样）
-        const sanitized = line.replace(/[\u4e00-\u9fa5]+/g, '');
-        const match = sanitized.match(/(https?:\/\/[^\s<>"'{}|\\^`\[\]]+|[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+\/[^\s<>"'{}|\\^`\[\]]*|[a-zA-Z0-9-]+\.[a-zA-Z]{2,})/gi);
-        if (match) {
-          match.forEach(url => extractedSet.add(cleanUrl(url)));
-        }
+      // 2. 使用正则匹配完整的 URL 结构（支持带/不带 http，以及完整路径参数）
+      const urlRegex = /(?:https?:\/\/)?(?:[a-zA-Z0-9-]+\.)+[a-zA-Z]{2,}(?::\d+)?(?:\/[^\s<>"'{}|\\^`\[\]]*)?/gi;
+      const matches = sanitizedLine.match(urlRegex);
+
+      if (matches) {
+        matches.forEach(url => {
+          const cleaned = cleanUrl(url);
+          if (cleaned) extractedSet.add(cleaned);
+        });
       }
     });
 
@@ -103,6 +102,8 @@ document.addEventListener('DOMContentLoaded', () => {
   // 格式化 URL 与补充 http/https 前缀
   function cleanUrl(url) {
     let cleaned = url.replace(/[，。；！,;!]+$/, '').trim();
+    // 过滤掉只有点或不完整的非法结构
+    if (!cleaned.includes('.')) return '';
     if (!/^https?:\/\//i.test(cleaned)) {
       cleaned = 'https://' + cleaned;
     }
