@@ -19,29 +19,48 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // 提取链接主逻辑
   extractBtn.addEventListener('click', () => {
-    const text = rawInput.value;
-    // 正则表达式过滤 URL
-    const urlRegex = /(https?:\/\/[^\s<>"'{}|\\^`\[\]]+)/gi;
-    const matches = text.match(urlRegex) || [];
-
-    // 去重并清洗尾部标点
-    const cleanedLinks = [...new Set(matches.map(url => url.replace(/[，。；！,;!]+$/, '')))];
-
+    const rawText = rawInput.value.trim();
+    
     // 清空展示区域
     linksContainer.textContent = '';
 
+    if (!rawText) {
+      renderEmpty('请输入或粘贴需要提取的文本');
+      return;
+    }
+
+    const extractedSet = new Set();
+    const lines = rawText.split(/[\r\n\s]+/);
+
+    lines.forEach(line => {
+      if (!line.trim()) return;
+
+      // 1. 标准 URL 正则（匹配带有 http/https 或常用域名结构的字符串）
+      const standardRegex = /(https?:\/\/[^\s\u4e00-\u9fa5<>"'{}|\\^`\[\]]+|[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+[^\s\u4e00-\u9fa5<>"'{}|\\^`\[\]]*)/gi;
+      const directMatches = line.match(standardRegex);
+
+      if (directMatches) {
+        directMatches.forEach(url => extractedSet.add(cleanUrl(url)));
+      } else {
+        // 2. 混淆链接容错：去除文本中间夹杂的中文字符（如“删”、“中”、“文”等防封字样）
+        const sanitized = line.replace(/[\u4e00-\u9fa5]+/g, '');
+        const match = sanitized.match(/(https?:\/\/[^\s<>"'{}|\\^`\[\]]+|[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+\/[^\s<>"'{}|\\^`\[\]]*|[a-zA-Z0-9-]+\.[a-zA-Z]{2,})/gi);
+        if (match) {
+          match.forEach(url => extractedSet.add(cleanUrl(url)));
+        }
+      }
+    });
+
+    const cleanedLinks = Array.from(extractedSet).filter(Boolean);
+
     if (cleanedLinks.length === 0) {
-      resultCount.textContent = '提取结果：';
-      const emptyBox = document.createElement('div');
-      emptyBox.className = 'empty-box';
-      emptyBox.textContent = '未检测到有效 URL 链接';
-      linksContainer.appendChild(emptyBox);
+      renderEmpty('未检测到有效 URL 链接');
       return;
     }
 
     resultCount.textContent = `提取结果（${cleanedLinks.length} 条）：`;
 
-    // 安全渲染卡片节点（不使用 innerHTML，规避 Firefox 警告）
+    // 纯 DOM 节点构建渲染（不使用 innerHTML，安全合规）
     cleanedLinks.forEach(url => {
       const card = document.createElement('div');
       card.className = 'link-card';
@@ -56,7 +75,13 @@ document.addEventListener('DOMContentLoaded', () => {
       const openBtn = document.createElement('button');
       openBtn.className = 'icon-btn';
       openBtn.textContent = '打开';
-      openBtn.onclick = () => chrome.tabs.create({ url });
+      openBtn.onclick = () => {
+        if (typeof chrome !== 'undefined' && chrome.tabs && chrome.tabs.create) {
+          chrome.tabs.create({ url });
+        } else {
+          window.open(url, '_blank');
+        }
+      };
 
       const copyBtn = document.createElement('button');
       copyBtn.className = 'icon-btn';
@@ -75,6 +100,25 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
+  // 格式化 URL 与补充 http/https 前缀
+  function cleanUrl(url) {
+    let cleaned = url.replace(/[，。；！,;!]+$/, '').trim();
+    if (!/^https?:\/\//i.test(cleaned)) {
+      cleaned = 'https://' + cleaned;
+    }
+    return cleaned;
+  }
+
+  // 渲染空状态说明
+  function renderEmpty(message) {
+    resultCount.textContent = '提取结果：';
+    const emptyBox = document.createElement('div');
+    emptyBox.className = 'empty-box';
+    emptyBox.textContent = message;
+    linksContainer.appendChild(emptyBox);
+  }
+
+  // 状态提示显示
   function showStatus(msg) {
     status.textContent = msg;
     status.style.display = 'inline';
