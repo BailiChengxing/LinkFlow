@@ -2,54 +2,66 @@
 <html lang="zh-CN">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>清链助手</title>
   <style>
-    html, body {
-      width: 320px;
-      margin: 0;
-      padding: 0;
-      background-color: #ffffff !important;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-      color: #202124;
-    }
-
-    .app-card {
-      padding: 16px;
+    /* 基础重置 & 固定桌面端 Popup 尺寸 */
+    *, *::before, *::after {
       box-sizing: border-box;
     }
 
+    html, body {
+      width: 350px;
+      margin: 0;
+      padding: 0;
+      background-color: #ffffff !important;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      color: #202124;
+      overflow-x: hidden;
+    }
+
+    .app-card {
+      padding: 14px;
+      width: 100%;
+    }
+
     h3 {
-      margin: 0 0 12px 0;
+      margin: 0 0 10px 0;
       font-size: 15px;
+      font-weight: 600;
       display: flex;
       align-items: center;
       gap: 8px;
+      color: #1a73e8;
     }
 
-    /* 标题旁的 SVG 图标样式 */
+    /* SVG 矢量图标 */
     .title-icon {
-      width: 20px;
-      height: 20px;
-      vertical-align: middle;
+      width: 22px;
+      height: 22px;
+      flex-shrink: 0;
     }
 
     .input-group {
       position: relative;
-      margin-bottom: 12px;
+      margin-bottom: 10px;
+      width: 100%;
     }
 
     textarea {
       width: 100%;
-      height: 80px;
-      padding: 10px 10px 34px 10px;
-      box-sizing: border-box;
+      height: 90px;
+      padding: 8px 8px 36px 8px;
       border: 1px solid #dadce0;
-      border-radius: 10px;
+      border-radius: 8px;
       font-size: 12px;
+      line-height: 1.4;
       resize: none;
       font-family: inherit;
       outline: none;
       transition: border-color 0.2s, box-shadow 0.2s;
       background-color: #f8f9fa;
+      display: block;
     }
 
     textarea:focus {
@@ -60,26 +72,31 @@
 
     .paste-btn {
       position: absolute;
-      right: 8px;
-      bottom: 10px;
+      right: 6px;
+      bottom: 6px;
       background-color: #e8f0fe;
       color: #1a73e8;
-      border: none;
+      border: 1px solid #d2e3fc;
       border-radius: 6px;
-      padding: 4px 10px;
+      padding: 4px 8px;
       font-size: 11px;
       cursor: pointer;
       font-weight: 500;
-      transition: background-color 0.2s;
+      transition: background-color 0.2s, color 0.2s;
+      display: inline-flex;
+      align-items: center;
+      gap: 3px;
+      line-height: 1;
     }
 
     .paste-btn:hover {
-      background-color: #d2e3fc;
+      background-color: #1a73e8;
+      color: #ffffff;
     }
 
     .action-btn {
       width: 100%;
-      padding: 10px;
+      height: 36px;
       background-color: #1a73e8;
       color: white;
       border: none;
@@ -88,6 +105,9 @@
       cursor: pointer;
       font-weight: 600;
       transition: background-color 0.2s, transform 0.1s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
 
     .action-btn:hover {
@@ -95,41 +115,53 @@
     }
 
     .action-btn:active {
-      transform: scale(0.99);
+      transform: scale(0.98);
     }
 
     .result-section {
-      margin-top: 14px;
+      margin-top: 12px;
     }
 
     .result-title {
-      font-size: 11px;
+      font-size: 12px;
       color: #5f6368;
       margin-bottom: 6px;
       display: flex;
       justify-content: space-between;
       align-items: center;
+      font-weight: 500;
     }
 
     .status {
       font-size: 11px;
       font-weight: 500;
+      color: #1e8e3e;
       display: none;
     }
 
     .links-container {
-      max-height: 180px;
+      max-height: 190px;
       overflow-y: auto;
       display: flex;
       flex-direction: column;
       gap: 8px;
+      padding-right: 2px;
+    }
+
+    /* 自定义滚动条，保持精致视觉 */
+    .links-container::-webkit-scrollbar {
+      width: 5px;
+    }
+    .links-container::-webkit-scrollbar-thumb {
+      background: #dadce0;
+      border-radius: 4px;
     }
 
     .link-card {
       padding: 8px 10px;
       background: #f8f9fa;
       border: 1px solid #e8eaed;
-      border-radius: 8px;
+      border-radius: 6px;
       display: flex;
       flex-direction: column;
       gap: 6px;
@@ -137,11 +169,11 @@
 
     .link-text {
       word-break: break-all;
-      font-size: 12px;
+      font-size: 11px;
       color: #1a73e8;
-      font-family: monospace;
+      font-family: ui-monospace, SFMono-Regular, SF Pro Text, Consolas, monospace;
       text-decoration: none;
-      cursor: pointer;
+      line-height: 1.3;
     }
 
     .link-text:hover {
@@ -158,11 +190,12 @@
       background: #ffffff;
       border: 1px solid #dadce0;
       border-radius: 4px;
-      padding: 2px 8px;
+      padding: 3px 8px;
       font-size: 11px;
       color: #3c4043;
       cursor: pointer;
-      transition: all 0.2s;
+      transition: all 0.15s ease-in-out;
+      line-height: 1;
     }
 
     .icon-btn:hover {
@@ -172,47 +205,24 @@
     }
 
     .empty-box {
-      padding: 10px;
+      padding: 8px 10px;
       background: #fce8e6;
       border: 1px solid #fad2cf;
-      border-radius: 8px;
+      border-radius: 6px;
       color: #d93025;
       font-size: 12px;
     }
 
-  /* 针对手机移动端及小屏幕设备的触控优化 */
-  @media (max-width: 600px) {
-    body {
-      width: 100vw;
-      min-width: 320px;
-      padding: 16px;
-      box-sizing: border-box;
+    /* 仅在真机移动端（Firefox Android）环境生效的样式适配 */
+    @media pointer: coarse {
+      html, body {
+        width: 100vw;
+      }
+      .icon-btn {
+        padding: 6px 12px;
+        font-size: 12px;
+      }
     }
-
-    /* 增大点击区域，方便移动端手指触摸操作 */
-    .icon-btn, button {
-      padding: 10px 16px;
-      font-size: 14px;
-      min-height: 44px; /* 符合移动端 44px 最小触控规范 */
-    }
-
-    textarea {
-      font-size: 14px;
-      min-height: 120px;
-    }
-
-    .link-card {
-      padding: 12px;
-      flex-direction: column;
-      align-items: flex-start;
-      gap: 8px;
-    }
-
-    .link-actions {
-      width: 100%;
-      justify-content: flex-end;
-    }
-  }
   </style>
 </head>
 <body>
@@ -237,11 +247,11 @@
         </g>
         <path d="M 96 70 L 98.5 81.5 L 110 84 L 98.5 86.5 L 96 98 L 93.5 86.5 L 82 84 L 93.5 81.5 Z" fill="#FFD700" />
       </svg>
-      批量链接提取
+      清链助手
     </h3>
 
     <div class="input-group">
-      <textarea id="rawInput" placeholder="在此粘贴包含多个链接的混乱文本..."></textarea>
+      <textarea id="rawInput" placeholder="在此粘贴包含多个链接的文本..."></textarea>
       <button id="pasteBtn" class="paste-btn" title="读取剪切板">📋 读取剪切板</button>
     </div>
 
