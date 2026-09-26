@@ -179,6 +179,40 @@
       color: #d93025;
       font-size: 12px;
     }
+
+  /* 针对手机移动端及小屏幕设备的触控优化 */
+  @media (max-width: 600px) {
+    body {
+      width: 100vw;
+      min-width: 320px;
+      padding: 16px;
+      box-sizing: border-box;
+    }
+
+    /* 增大点击区域，方便移动端手指触摸操作 */
+    .icon-btn, button {
+      padding: 10px 16px;
+      font-size: 14px;
+      min-height: 44px; /* 符合移动端 44px 最小触控规范 */
+    }
+
+    textarea {
+      font-size: 14px;
+      min-height: 120px;
+    }
+
+    .link-card {
+      padding: 12px;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 8px;
+    }
+
+    .link-actions {
+      width: 100%;
+      justify-content: flex-end;
+    }
+  }
   </style>
 </head>
 <body>

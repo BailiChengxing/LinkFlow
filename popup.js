@@ -4,131 +4,82 @@ document.addEventListener('DOMContentLoaded', () => {
   const extractBtn = document.getElementById('extractBtn');
   const linksContainer = document.getElementById('linksContainer');
   const resultCount = document.getElementById('resultCount');
-  const statusDiv = document.getElementById('status');
+  const status = document.getElementById('status');
 
-  // 1. 强校验单条 URL 是否合法
-  function isValidUrl(urlString) {
-    try {
-      const parsed = new URL(urlString);
-      if (!['http:', 'https:'].includes(parsed.protocol)) return false;
-      const hostParts = parsed.hostname.split('.');
-      if (hostParts.length < 2) return false;
-      const tld = hostParts[hostParts.length - 1];
-      return tld.length >= 2 && /^[a-zA-Z]+$/.test(tld);
-    } catch (e) {
-      return false;
-    }
-  }
-
-  // 2. 批量提取并清洗多条链接
-  function extractAllUrls(text) {
-    if (!text || !text.trim()) return [];
-
-    // 全局正则匹配 URL
-    const globalUrlPattern = /(https?:\/\/)?([a-zA-Z0-9-]+\.)+[a-zA-Z]{2,}(:\d+)?(\/[^\s\u4e00-\u9fa5【】\[\]()]*)?/gi;
-    const matches = text.match(globalUrlPattern) || [];
-
-    const extractedSet = new Set(); // 去重集合
-
-    matches.forEach(rawUrl => {
-      // 细节清洗：移除尾部标点符号
-      let cleanUrl = rawUrl.replace(/[.,;:!?\s]+$/, '');
-      if (!/^https?:\/\//i.test(cleanUrl)) {
-        cleanUrl = 'https://' + cleanUrl;
-      }
-
-      if (isValidUrl(cleanUrl)) {
-        extractedSet.add(cleanUrl);
-      }
-    });
-
-    return Array.from(extractedSet);
-  }
-
-  // 提示信息控制
-  function showStatus(msg, isError = false) {
-    statusDiv.innerText = msg;
-    statusDiv.style.color = isError ? '#d93025' : '#188038';
-    statusDiv.style.display = 'inline';
-    setTimeout(() => {
-      statusDiv.style.display = 'none';
-    }, 3000);
-  }
-
-  // 3. 渲染多链接列表 UI
-  function renderLinks(urls) {
-    linksContainer.innerHTML = '';
-
-    if (urls.length === 0) {
-      resultCount.innerText = '提取结果：0 条';
-      linksContainer.innerHTML = `<div class="empty-box">⚠️ 未在文本中提取到有效的链接！</div>`;
-      return;
-    }
-
-    resultCount.innerText = `已提取 ${urls.length} 条链接：`;
-
-    urls.forEach((url, index) => {
-      const card = document.createElement('div');
-      card.className = 'link-card';
-
-      card.innerHTML = `
-        <a class="link-text" data-url="${url}" title="点击打开">${index + 1}. ${url}</a>
-        <div class="link-actions">
-          <button class="icon-btn copy-single-btn" data-url="${url}">📋 复制</button>
-          <button class="icon-btn open-single-btn" data-url="${url}">🚀 打开</button>
-        </div>
-      `;
-
-      linksContainer.appendChild(card);
-    });
-
-    // 绑定卡片上的点击事件（打开链接）
-    linksContainer.querySelectorAll('.link-text, .open-single-btn').forEach(btn => {
-      btn.addEventListener('click', (e) => {
-        e.preventDefault();
-        const targetUrl = e.currentTarget.getAttribute('data-url');
-        if (typeof chrome !== 'undefined' && chrome.tabs) {
-          chrome.tabs.create({ url: targetUrl });
-        } else {
-          window.open(targetUrl, '_blank');
-        }
-      });
-    });
-
-    // 绑定单条复制按钮点击事件
-    linksContainer.querySelectorAll('.copy-single-btn').forEach(btn => {
-      btn.addEventListener('click', async (e) => {
-        const targetUrl = e.currentTarget.getAttribute('data-url');
-        await navigator.clipboard.writeText(targetUrl);
-        showStatus("✅ 已复制该链接");
-      });
-    });
-  }
-
-  // 4. “读取剪切板”按钮逻辑
+  // 读取剪切板
   pasteBtn.addEventListener('click', async () => {
     try {
       const text = await navigator.clipboard.readText();
-      if (text) {
-        rawInput.value = text;
-        showStatus("📋 已读取剪切板");
-      } else {
-        showStatus("⚠️ 剪切板为空", true);
-      }
+      rawInput.value = text;
+      showStatus('已读取剪切板');
     } catch (err) {
-      alert("无法读取剪切板，请确保授权: " + err.message);
+      showStatus('读取失败，请手动粘贴');
     }
   });
 
-  // 5. “提取全部链接”主按钮逻辑（仅做提取展示，不写入剪切板）
+  // 提取链接主逻辑
   extractBtn.addEventListener('click', () => {
-    const urls = extractAllUrls(rawInput.value);
-    renderLinks(urls);
+    const text = rawInput.value;
+    // 正则表达式过滤 URL
+    const urlRegex = /(https?:\/\/[^\s<>"'{}|\\^`\[\]]+)/gi;
+    const matches = text.match(urlRegex) || [];
 
-    if (urls.length > 0) {
-      showStatus(`🎉 已成功提取 ${urls.length} 条链接`);
-    } else {
-      showStatus("⚠️ 提取失败", true);
+    // 去重并清洗尾部标点
+    const cleanedLinks = [...new Set(matches.map(url => url.replace(/[，。；！,;!]+$/, '')))];
+
+    // 清空展示区域
+    linksContainer.textContent = '';
+
+    if (cleanedLinks.length === 0) {
+      resultCount.textContent = '提取结果：';
+      const emptyBox = document.createElement('div');
+      emptyBox.className = 'empty-box';
+      emptyBox.textContent = '未检测到有效 URL 链接';
+      linksContainer.appendChild(emptyBox);
+      return;
     }
+
+    resultCount.textContent = `提取结果（${cleanedLinks.length} 条）：`;
+
+    // 安全渲染卡片节点（不使用 innerHTML，规避 Firefox 警告）
+    cleanedLinks.forEach(url => {
+      const card = document.createElement('div');
+      card.className = 'link-card';
+
+      const linkText = document.createElement('span');
+      linkText.className = 'link-text';
+      linkText.textContent = url;
+
+      const btnGroup = document.createElement('div');
+      btnGroup.className = 'link-actions';
+
+      const openBtn = document.createElement('button');
+      openBtn.className = 'icon-btn';
+      openBtn.textContent = '打开';
+      openBtn.onclick = () => chrome.tabs.create({ url });
+
+      const copyBtn = document.createElement('button');
+      copyBtn.className = 'icon-btn';
+      copyBtn.textContent = '复制';
+      copyBtn.onclick = () => {
+        navigator.clipboard.writeText(url);
+        showStatus('已复制');
+      };
+
+      btnGroup.appendChild(openBtn);
+      btnGroup.appendChild(copyBtn);
+      card.appendChild(linkText);
+      card.appendChild(btnGroup);
+
+      linksContainer.appendChild(card);
+    });
   });
+
+  function showStatus(msg) {
+    status.textContent = msg;
+    status.style.display = 'inline';
+    setTimeout(() => {
+      status.style.display = 'none';
+    }, 2000);
+  }
 });
