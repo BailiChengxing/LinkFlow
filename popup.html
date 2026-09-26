@@ -214,15 +214,15 @@
     }
 
     /* 仅在真机移动端（Firefox Android）环境生效的样式适配 */
-    @media pointer: coarse {
-      html, body {
-        width: 100vw;
+    @media (pointer: coarse) {
+        html, body {
+          width: 100vw;
+        }
+        .icon-btn {
+          padding: 6px 12px;
+          font-size: 12px;
+        }
       }
-      .icon-btn {
-        padding: 6px 12px;
-        font-size: 12px;
-      }
-    }
   </style>
 </head>
 <body>
