@@ -1,0 +1,24 @@
+{
+  "manifest_version": 3,
+  "name": "清链助手",
+  "version": "1.0.0",
+  "description": "自动清洗文本中混淆的干扰项并批量提取合法链接",
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "bailichengxing@gmail.com"
+    }
+  },
+  "icons": {
+    "16": "icon.png",
+    "48": "icon.png",
+    "128": "icon.png"
+  },
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "清链助手",
+    "default_icon": "icon.png"
+  },
+  "permissions": [
+    "clipboardRead"
+  ]
+}
