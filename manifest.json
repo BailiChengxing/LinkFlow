@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "清链助手",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "批量提取与清洗文本中的 URL，极简、高效、无广告。",
   "browser_specific_settings": {
     "gecko": {
@@ -16,10 +16,10 @@
     }
   },
   "icons": {
-    "16": "icon.png",
-    "32": "icon.png",
-    "48": "icon.png",
-    "64": "icon.png",
+    "16": "ico16.png",
+    "32": "ico32.png",
+    "48": "ico48.png",
+    "64": "ico64.png",
     "128": "icon.png"
   },
   "action": {
