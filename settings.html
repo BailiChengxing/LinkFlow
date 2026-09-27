@@ -1044,21 +1044,21 @@
 
       <section id="section-test" class="settings-section" aria-labelledby="testTitle" hidden>
         <header class="page-heading">
-          <h1 id="testTitle" data-i18n="settings.testTitle">连通性测试</h1>
-          <p class="intro" data-i18n="settings.testIntro">提取链接后可选检查链接是否有响应。</p>
+          <h1 id="testTitle" data-i18n="settings.testTitle">链接有效测试</h1>
+          <p class="intro" data-i18n="settings.testIntro">提取链接后可选检查链接是否有效并收到 HTTP 响应。</p>
         </header>
         <div class="panel">
           <div class="test-setting-row">
             <div class="test-setting-copy">
-              <strong data-i18n="settings.connectivityEnable">启用链接连通性测试</strong>
+              <strong data-i18n="settings.connectivityEnable">启用链接有效测试</strong>
               <span data-i18n="settings.connectivityEnableDesc">提取完成后向每个链接发送请求并显示测试结果。</span>
             </div>
-            <input id="connectivityEnabled" type="checkbox" data-i18n-aria="settings.connectivityEnable" aria-label="启用链接连通性测试">
+            <input id="connectivityEnabled" type="checkbox" data-i18n-aria="settings.connectivityEnable" aria-label="启用链接有效测试">
           </div>
           <div class="test-setting-row">
             <label class="test-setting-copy" for="connectivityConcurrency">
               <strong data-i18n="settings.concurrencyLabel">最大并发数</strong>
-              <span data-i18n="settings.concurrencyDesc">同时进行的连通性请求数量（1–20）。</span>
+              <span data-i18n="settings.concurrencyDesc">同时进行的有效性检测请求数量（1–20）。</span>
             </label>
             <input id="connectivityConcurrency" class="concurrency-input" type="number" min="1" max="20" step="1" value="4">
           </div>
