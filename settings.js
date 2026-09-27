@@ -1,6 +1,7 @@
 (() => {
   const REGEX_STORAGE_KEY = 'linkflow.regexSettings';
   const NOISE_STORAGE_KEY = 'linkflow.noiseRules';
+  const BRACKET_STORAGE_KEY = 'linkflow.bracketCleanup';
   const DEFAULT_PATTERN = "(?:https?:\\/\\/)?(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\\.)+[a-z]{2,}(?::\\d{1,5})?(?:[/?#][^\\s<>\"'{}|\\\\^`\\[\\]]*)?";
   const DEFAULT_FLAGS = 'gi';
   const PRESETS = {
@@ -22,15 +23,34 @@
   const resetBtn = document.getElementById('resetBtn');
   const message = document.getElementById('message');
   const langSelect = document.getElementById('langSelect');
+  const themeSelect = document.getElementById('themeSelect');
   const languagePresetSelect = document.getElementById('languagePresetSelect');
   const languageRulesList = document.getElementById('languageRulesList');
 
+  function syncAboutVersion() {
+    const versionElement = document.querySelector('[data-i18n="settings.aboutVersion"]');
+    if (!versionElement) return;
+
+    let version = '1.1.5';
+    try {
+      const runtime = globalThis.browser?.runtime || globalThis.chrome?.runtime;
+      version = runtime?.getManifest?.().version || version;
+    } catch {
+      // Keep the displayed fallback version when the extension API is unavailable.
+    }
+    versionElement.textContent = I18N.t('settings.aboutVersion', { version });
+  }
+
   async function initPage() {
     await I18N.init();
+    syncAboutVersion();
+    Theme.apply();
     document.getElementById('defaultRuleCode').textContent = `/${DEFAULT_PATTERN}/${DEFAULT_FLAGS}`;
     langSelect.value = I18N.getCurrentLang();
+    themeSelect.value = Theme.getPreference();
     loadRule();
     loadNoiseRules();
+    loadBracketOptions();
     updatePresetOptions();
   }
 
@@ -55,8 +75,10 @@
     try {
       const rule = validateRule();
       const noiseRules = collectNoiseRules();
+      const bracketPairs = collectBracketOptions();
       localStorage.setItem(REGEX_STORAGE_KEY, JSON.stringify(rule));
       localStorage.setItem(NOISE_STORAGE_KEY, JSON.stringify(noiseRules));
+      localStorage.setItem(BRACKET_STORAGE_KEY, JSON.stringify(bracketPairs));
       flagsInput.value = rule.flags;
       showMessage(message, I18N.t('settings.saveSuccess'));
     } catch (error) {
@@ -174,6 +196,24 @@
     renderNoiseRules([{ name: PRESETS.chinese.name, range: PRESETS.chinese.range, preset: 'chinese' }]);
   }
 
+  function loadBracketOptions() {
+    let enabledPairs = [];
+    try {
+      const saved = JSON.parse(localStorage.getItem(BRACKET_STORAGE_KEY) || '[]');
+      if (Array.isArray(saved)) enabledPairs = saved;
+    } catch {
+      // Keep all bracket cleanup options disabled if stored settings are unreadable.
+    }
+    document.querySelectorAll('[data-bracket-pair]').forEach(option => {
+      option.checked = enabledPairs.includes(option.dataset.bracketPair);
+    });
+  }
+
+  function collectBracketOptions() {
+    return Array.from(document.querySelectorAll('[data-bracket-pair]:checked'))
+      .map(option => option.dataset.bracketPair);
+  }
+
   function collectNoiseRules() {
     const rows = Array.from(languageRulesList.querySelectorAll('.language-rule'));
     const rules = [];
@@ -207,10 +247,15 @@
   langSelect.addEventListener('change', async () => {
     I18N.setLang(langSelect.value);
     await I18N.init();
+    syncAboutVersion();
     langSelect.value = I18N.getCurrentLang();
     document.getElementById('defaultRuleCode').textContent = `/${DEFAULT_PATTERN}/${DEFAULT_FLAGS}`;
     updatePresetOptions();
     showMessage(message, '');
+  });
+
+  themeSelect.addEventListener('change', () => {
+    themeSelect.value = Theme.setPreference(themeSelect.value);
   });
 
   document.getElementById('addLanguageRuleBtn').addEventListener('click', () => {

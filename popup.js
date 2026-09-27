@@ -1,6 +1,7 @@
 ﻿document.addEventListener('DOMContentLoaded', async () => {
   // Initialize i18n
   await I18N.init();
+  Theme.apply();
 
   const rawInput = document.getElementById('rawInput');
   const pasteBtn = document.getElementById('pasteBtn');
@@ -42,7 +43,7 @@
     }
 
     const extractedSet = new Set();
-    const sanitizedText = removeInsertedNoise(rawText);
+    const sanitizedText = removeBracketedContent(removeInsertedNoise(rawText));
     const urlRegex = getUrlRegex();
     const matches = sanitizedText.match(urlRegex) || [];
 
@@ -143,6 +144,54 @@
     });
 
     return cleaned;
+  }
+
+  function removeBracketedContent(text) {
+    let enabledPairs;
+    try {
+      enabledPairs = JSON.parse(localStorage.getItem('linkflow.bracketCleanup') || '[]');
+    } catch {
+      enabledPairs = [];
+    }
+    if (!Array.isArray(enabledPairs) || enabledPairs.length === 0) return text;
+
+    const openToClose = new Map();
+    const closingCharacters = new Set();
+    enabledPairs.forEach(pair => {
+      if (typeof pair === 'string' && pair.length === 2) {
+        openToClose.set(pair[0], pair[1]);
+        closingCharacters.add(pair[1]);
+      }
+    });
+    if (openToClose.size === 0) return text;
+
+    const stack = [];
+    const removed = new Uint8Array(text.length);
+    for (let index = 0; index < text.length; index += 1) {
+      const character = text[index];
+      if (openToClose.has(character)) {
+        const close = openToClose.get(character);
+        const opening = stack[stack.length - 1];
+        if (character === close && opening && opening.close === character) {
+          stack.pop();
+          removed.fill(1, opening.index, index + 1);
+        } else {
+          stack.push({ index, close });
+        }
+      } else if (closingCharacters.has(character) && stack.length > 0) {
+        const opening = stack[stack.length - 1];
+        if (opening.close === character) {
+          stack.pop();
+          removed.fill(1, opening.index, index + 1);
+        }
+      }
+    }
+
+    let result = '';
+    for (let index = 0; index < text.length; index += 1) {
+      if (!removed[index]) result += text[index];
+    }
+    return result;
   }
 
   function cleanUrl(url) {

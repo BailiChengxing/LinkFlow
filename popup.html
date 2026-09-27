@@ -13,7 +13,7 @@
       width: 350px;
       margin: 0;
       padding: 0;
-      background-color: #ffffff !important;
+      background-color: #ffffff;
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
       color: #202124;
       overflow-x: hidden;
@@ -244,6 +244,62 @@
           font-size: 12px;
         }
       }
+
+      html[data-theme="dark"] body {
+        background-color: #17191f;
+        color: #e8eaed;
+      }
+
+      html[data-theme="dark"] .settings-btn,
+      html[data-theme="dark"] .icon-btn {
+        border-color: #454b57;
+        background: #252932;
+        color: #d7dbe3;
+      }
+
+      html[data-theme="dark"] .settings-btn:hover,
+      html[data-theme="dark"] .icon-btn:hover {
+        border-color: #526b91;
+        background: #2d3746;
+        color: #a9c7ff;
+      }
+
+      html[data-theme="dark"] textarea {
+        border-color: #454b57;
+        background-color: #22252d;
+        color: #e8eaed;
+      }
+
+      html[data-theme="dark"] textarea:focus {
+        background-color: #1b1e25;
+      }
+
+      html[data-theme="dark"] .result-title {
+        color: #b6bbc6;
+      }
+
+      html[data-theme="dark"] .links-container::-webkit-scrollbar-thumb {
+        background: #505662;
+      }
+
+      html[data-theme="dark"] .link-card {
+        border-color: #343944;
+        background: #22252d;
+      }
+
+      html[data-theme="dark"] .link-text {
+        color: #8ab4f8;
+      }
+
+      html[data-theme="dark"] .empty-box {
+        border-color: #68413f;
+        background: #302322;
+        color: #ffaaa4;
+      }
+
+      html[data-theme="dark"] #linksContainer > div[style] {
+        color: #aeb4c0 !important;
+      }
   </style>
 </head>
 <body>
@@ -293,6 +349,7 @@
   </div>
 
   <script src="i18n.js"></script>
+  <script src="theme.js"></script>
   <script src="popup.js"></script>
 </body>
 </html>

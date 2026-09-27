@@ -82,7 +82,7 @@
     "aboutDescription": "混在テキストからURLを抽出・重複排除・クリーニングし、正規表現と多言語文字除去を設定できます。",
     "aboutLocal": "すべての処理はブラウザー内で行われ、テキストは送信されません。",
     "aboutRegex": "マッチングルールと文字除去リストはカスタマイズできます。",
-    "aboutVersion": "バージョン：1.0.5",
+    "aboutVersion": "バージョン：{version}",
     "aboutGithub": "GitHub プロジェクトページ"
   }
 }

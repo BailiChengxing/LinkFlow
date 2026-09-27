@@ -646,6 +646,215 @@
         flex-wrap: wrap;
       }
     }
+
+    /* Dark theme overrides shared by every settings section. */
+    html[data-theme="dark"] body {
+      background: #111318;
+      color: #e8eaed;
+    }
+
+    html[data-theme="dark"] .sidebar,
+    html[data-theme="dark"] .panel,
+    html[data-theme="dark"] .about-card,
+    html[data-theme="dark"] .language-rule,
+    html[data-theme="dark"] .setting-block {
+      border-color: #343944;
+      background: #1b1e25;
+      color: #e8eaed;
+    }
+
+    html[data-theme="dark"] .sidebar {
+      border-right-color: #343944;
+    }
+
+    html[data-theme="dark"] .default-rule,
+    html[data-theme="dark"] .quick-lang-section {
+      border-color: #34445e;
+      background: #202938;
+    }
+
+    html[data-theme="dark"] .default-code,
+    html[data-theme="dark"] textarea,
+    html[data-theme="dark"] input,
+    html[data-theme="dark"] .lang-select,
+    html[data-theme="dark"] .quick-lang-btn {
+      border-color: #454b57;
+      background-color: #15181e;
+      color: #e8eaed;
+    }
+
+    html[data-theme="dark"] .lang-select:hover,
+    html[data-theme="dark"] .quick-lang-btn:hover {
+      background-color: #252c37;
+    }
+
+    html[data-theme="dark"] .default-rule p,
+    html[data-theme="dark"] .intro,
+    html[data-theme="dark"] .help-text,
+    html[data-theme="dark"] .flags-hint,
+    html[data-theme="dark"] .quick-lang-desc,
+    html[data-theme="dark"] .language-hint,
+    html[data-theme="dark"] .footnote,
+    html[data-theme="dark"] .privacy-note,
+    html[data-theme="dark"] .sidebar-footer,
+    html[data-theme="dark"] .about-card p,
+    html[data-theme="dark"] .about-card li {
+      color: #aeb4c0;
+    }
+
+    html[data-theme="dark"] .default-code {
+      color: #a9c7ff;
+    }
+
+    html[data-theme="dark"] .actions,
+    html[data-theme="dark"] .lang-row {
+      border-color: #343944;
+    }
+
+    html[data-theme="dark"] .nav-item {
+      color: #b6bbc6;
+    }
+
+    html[data-theme="dark"] .nav-item:hover {
+      background: #252c37;
+      color: #a9c7ff;
+    }
+
+    html[data-theme="dark"] .nav-item[aria-current="page"] {
+      background: #253854;
+      color: #a9c7ff;
+    }
+
+    html[data-theme="dark"] .secondary-btn {
+      border-color: #454b57;
+      background: #252932;
+      color: #e8eaed;
+    }
+
+    html[data-theme="dark"] .secondary-btn:hover {
+      border-color: #6d8fc4;
+      background: #2d3746;
+    }
+
+    html[data-theme="dark"] .delete-rule-btn {
+      border-color: #68413f;
+      background: #302322;
+      color: #ffaaa4;
+    }
+
+    html[data-theme="dark"] .delete-rule-btn:hover {
+      background: #442b29;
+    }
+
+    html[data-theme="dark"] .about-card ul {
+      color: #aeb4c0;
+    }
+
+    .bracket-options {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 9px;
+      margin: 14px 0 22px;
+    }
+
+    .panel:has(.setting-block) {
+      padding: 22px;
+    }
+
+    .setting-block {
+      margin-bottom: 16px;
+      padding: 20px;
+      border: 1px solid #e4e8f0;
+      border-radius: 12px;
+      background: #ffffff;
+    }
+
+    .setting-block:last-of-type {
+      margin-bottom: 0;
+    }
+
+    .setting-block-heading {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+
+    .setting-block-title,
+    .setting-block-heading h2 {
+      margin: 0 0 14px;
+      font-size: 19px;
+      line-height: 1.35;
+      letter-spacing: -0.2px;
+    }
+
+    .setting-block-heading h2 {
+      margin: 0;
+    }
+
+    .setting-subtitle {
+      margin: 20px 0 6px;
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    .setting-block .quick-lang-desc {
+      margin-top: 0;
+    }
+
+    .setting-block .default-rule {
+      margin-bottom: 0;
+    }
+
+    .setting-block .flags-row {
+      margin-bottom: 0;
+    }
+
+    .setting-block .language-hint {
+      margin-bottom: 0;
+    }
+
+    .bracket-option {
+      display: inline-flex;
+      min-height: 38px;
+      align-items: center;
+      gap: 8px;
+      padding: 0 12px;
+      border: 1px solid #e4e8f0;
+      border-radius: 8px;
+      background: #ffffff;
+      color: #3c4043;
+      font-size: 13px;
+      cursor: pointer;
+    }
+
+    .bracket-option input {
+      width: 16px;
+      height: 16px;
+      margin: 0;
+      accent-color: #1a73e8;
+    }
+
+    html[data-theme="dark"] .bracket-option {
+      border-color: #454b57;
+      background: #15181e;
+      color: #e8eaed;
+    }
+
+    @media (max-width: 520px) {
+      .bracket-options {
+        gap: 7px;
+      }
+
+      .panel:has(.setting-block) {
+        padding: 14px;
+      }
+
+      .setting-block {
+        padding: 16px;
+      }
+    }
   </style>
 </head>
 <body>
@@ -672,44 +881,72 @@
         </header>
 
         <div class="panel">
-          <div class="default-rule">
-        <div class="default-heading">
-          <span data-i18n="settings.defaultRuleLabel">默认规则</span>
-          <button id="resetBtn" class="secondary-btn" type="button" data-i18n="settings.resetBtn">恢复默认</button>
-        </div>
-        <p data-i18n="settings.defaultRuleDesc">匹配带或不带 http/https 的域名，并提取端口、路径、查询参数及哈希片段。全局匹配标记 g 会自动启用。</p>
-        <pre id="defaultRuleCode" class="default-code"></pre>
-      </div>
+          <section class="setting-block">
+            <div class="setting-block-heading">
+              <h2 data-i18n="settings.defaultRuleSection">默认表达式</h2>
+              <button id="resetBtn" class="secondary-btn" type="button" data-i18n="settings.resetBtn">恢复默认</button>
+            </div>
+            <div class="default-rule">
+              <p data-i18n="settings.defaultRuleDesc">匹配带或不带 http/https 的域名，并提取端口、路径、查询参数及哈希片段。全局匹配标记 g 会自动启用。</p>
+              <pre id="defaultRuleCode" class="default-code"></pre>
+            </div>
+          </section>
 
-          <label class="field-label" for="patternInput" data-i18n="settings.patternLabel">正则表达式</label>
-      <textarea id="patternInput" spellcheck="false" autocapitalize="off" autocomplete="off" aria-describedby="patternHelp"></textarea>
-      <p id="patternHelp" class="help-text" data-i18n="settings.patternHelp">输入正则表达式主体，不需要包含两侧的斜杠。例如： https?:\/\/example\.com\/\S+</p>
+          <section class="setting-block">
+            <h2 class="setting-block-title" data-i18n="settings.regexSection">正则表达式</h2>
+            <label class="field-label" for="patternInput" data-i18n="settings.patternBodyLabel">表达式主体</label>
+            <textarea id="patternInput" spellcheck="false" autocapitalize="off" autocomplete="off" aria-describedby="patternHelp"></textarea>
+            <p id="patternHelp" class="help-text" data-i18n="settings.patternHelp">输入正则表达式主体，不需要包含两侧的斜杠。例如： https?:\/\/example\.com\/\S+</p>
+            <div class="flags-row">
+              <label class="field-label" for="flagsInput" data-i18n="settings.flagsLabel">标记</label>
+              <input id="flagsInput" type="text" value="gi" spellcheck="false" autocapitalize="off" autocomplete="off" aria-describedby="flagsHelp">
+              <span id="flagsHelp" class="flags-hint" data-i18n="settings.flagsHelp">g（全局）会自动启用；常用标记：i 不区分大小写、m 多行、s 点号匹配换行、u Unicode。</span>
+            </div>
+          </section>
 
-      <div class="flags-row">
-        <label class="field-label" for="flagsInput" data-i18n="settings.flagsLabel">标记</label>
-        <input id="flagsInput" type="text" value="gi" spellcheck="false" autocapitalize="off" autocomplete="off" aria-describedby="flagsHelp">
-        <span id="flagsHelp" class="flags-hint" data-i18n="settings.flagsHelp">g（全局）会自动启用；常用标记：i 不区分大小写、m 多行、s 点号匹配换行、u Unicode。</span>
-      </div>
+          <section class="setting-block">
+            <h2 class="setting-block-title" data-i18n="settings.inputCleanupSection">输入字符清理</h2>
+            <h3 class="setting-subtitle" data-i18n="settings.noiseRulesTitle">混入字符清理列表</h3>
+            <p class="quick-lang-desc" data-i18n="settings.noiseRulesDesc">提取前会移除已启用字符范围中的字符。可按需添加或删除；规则仅匹配字符，不会移除 URL 分隔符。</p>
+            <div class="language-actions">
+              <select id="languagePresetSelect" class="lang-select" aria-label="Language character set">
+                <option value="japanese" data-i18n="settings.presetJapanese">日文</option>
+                <option value="chinese" data-i18n="settings.presetChinese">中文</option>
+                <option value="korean" data-i18n="settings.presetKorean">韩文</option>
+                <option value="russian" data-i18n="settings.presetRussian">俄文</option>
+                <option value="arabic" data-i18n="settings.presetArabic">阿拉伯文</option>
+                <option value="thai" data-i18n="settings.presetThai">泰文</option>
+                <option value="greek" data-i18n="settings.presetGreek">希腊文</option>
+                <option value="hebrew" data-i18n="settings.presetHebrew">希伯来文</option>
+                <option value="devanagari" data-i18n="settings.presetDevanagari">天城文</option>
+                <option value="custom" data-i18n="settings.presetCustom">自定义</option>
+              </select>
+              <button id="addLanguageRuleBtn" class="secondary-btn" type="button" data-i18n="settings.addLanguageRule">＋ 添加语言</button>
+            </div>
+            <div id="languageRulesList" class="language-list"></div>
+            <p class="language-hint" data-i18n="settings.rangeHint">字符范围示例：\u3040-\u30ff（平假名与片假名）。建议只输入 Unicode 字符或范围，不要输入正则括号。</p>
+          </section>
 
-          <h2 class="quick-lang-heading" data-i18n="settings.noiseRulesTitle">混入字符清理列表</h2>
-          <p class="quick-lang-desc" data-i18n="settings.noiseRulesDesc">提取前会移除已启用字符范围中的字符。可按需添加或删除；规则仅匹配字符，不会移除 URL 分隔符。</p>
-          <div class="language-actions">
-            <select id="languagePresetSelect" class="lang-select" aria-label="Language character set">
-              <option value="japanese" data-i18n="settings.presetJapanese">日文</option>
-              <option value="chinese" data-i18n="settings.presetChinese">中文</option>
-              <option value="korean" data-i18n="settings.presetKorean">韩文</option>
-              <option value="russian" data-i18n="settings.presetRussian">俄文</option>
-              <option value="arabic" data-i18n="settings.presetArabic">阿拉伯文</option>
-              <option value="thai" data-i18n="settings.presetThai">泰文</option>
-              <option value="greek" data-i18n="settings.presetGreek">希腊文</option>
-              <option value="hebrew" data-i18n="settings.presetHebrew">希伯来文</option>
-              <option value="devanagari" data-i18n="settings.presetDevanagari">天城文</option>
-              <option value="custom" data-i18n="settings.presetCustom">自定义</option>
-            </select>
-            <button id="addLanguageRuleBtn" class="secondary-btn" type="button" data-i18n="settings.addLanguageRule">＋ 添加语言</button>
-          </div>
-          <div id="languageRulesList" class="language-list"></div>
-          <p class="language-hint" data-i18n="settings.rangeHint">字符范围示例：\u3040-\u30ff（平假名与片假名）。建议只输入 Unicode 字符或范围，不要输入正则括号。</p>
+          <section class="setting-block">
+            <h2 class="setting-block-title" data-i18n="settings.bracketCleanupTitle">括号内容清理</h2>
+            <p class="quick-lang-desc" data-i18n="settings.bracketCleanupDesc">勾选后，会从待处理文本中移除对应成对符号及其内部内容。</p>
+            <div class="bracket-options" role="group" data-i18n-aria="settings.bracketOptionsLabel" aria-label="选择要清除的括号及其内容">
+              <label class="bracket-option"><input type="checkbox" data-bracket-pair="()"><span>()</span></label>
+              <label class="bracket-option"><input type="checkbox" data-bracket-pair="（）"><span>（）</span></label>
+              <label class="bracket-option"><input type="checkbox" data-bracket-pair="【】"><span>【】</span></label>
+              <label class="bracket-option"><input type="checkbox" data-bracket-pair="[]"><span>[]</span></label>
+              <label class="bracket-option"><input type="checkbox" data-bracket-pair="&lt;&gt;"><span>&lt;&gt;</span></label>
+              <label class="bracket-option"><input type="checkbox" data-bracket-pair="《》"><span>《》</span></label>
+              <label class="bracket-option"><input type="checkbox" data-bracket-pair="{}"><span>{}</span></label>
+              <label class="bracket-option"><input type="checkbox" data-bracket-pair="&quot;&quot;"><span>""</span></label>
+              <label class="bracket-option"><input type="checkbox" data-bracket-pair="''"><span>''</span></label>
+              <label class="bracket-option"><input type="checkbox" data-bracket-pair="“”"><span>“”</span></label>
+              <label class="bracket-option"><input type="checkbox" data-bracket-pair="‘’"><span>‘’</span></label>
+              <label class="bracket-option"><input type="checkbox" data-bracket-pair="＂＂"><span>＂＂</span></label>
+              <label class="bracket-option"><input type="checkbox" data-bracket-pair="＇＇"><span>＇＇</span></label>
+            </div>
+          </section>
+
           <div class="actions">
             <button id="saveBtn" class="primary-btn" type="button" data-i18n="settings.saveAllBtn">保存所有设置</button>
             <span id="message" class="message" role="status" aria-live="polite"></span>
@@ -743,6 +980,14 @@
               <option value="hi">हिन्दी</option>
             </select>
           </div>
+          <div class="lang-row">
+            <label class="field-label" for="themeSelect" data-i18n="settings.themeLabel">主题</label>
+            <select id="themeSelect" class="lang-select">
+              <option value="light" data-i18n="settings.themeLight">浅色</option>
+              <option value="dark" data-i18n="settings.themeDark">深色</option>
+              <option value="auto" data-i18n="settings.themeAuto">自动（跟随浏览器）</option>
+            </select>
+          </div>
 
         </div>
       </section>
@@ -766,6 +1011,7 @@
     </main>
   </div>
   <script src="i18n.js"></script>
+  <script src="theme.js"></script>
   <script src="settings.js"></script>
 </body>
 </html>
