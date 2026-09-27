@@ -2,6 +2,7 @@
   const REGEX_STORAGE_KEY = 'linkflow.regexSettings';
   const NOISE_STORAGE_KEY = 'linkflow.noiseRules';
   const BRACKET_STORAGE_KEY = 'linkflow.bracketCleanup';
+  const CONNECTIVITY_STORAGE_KEY = 'linkflow.connectivityTest';
   const DEFAULT_PATTERN = "(?:https?:\\/\\/)?(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\\.)+[a-z]{2,}(?::\\d{1,5})?(?:[/?#][^\\s<>\"'{}|\\\\^`\\[\\]]*)?";
   const DEFAULT_FLAGS = 'gi';
   const PRESETS = {
@@ -24,6 +25,9 @@
   const message = document.getElementById('message');
   const langSelect = document.getElementById('langSelect');
   const themeSelect = document.getElementById('themeSelect');
+  const connectivityEnabled = document.getElementById('connectivityEnabled');
+  const connectivityConcurrency = document.getElementById('connectivityConcurrency');
+  const connectivitySettingsMessage = document.getElementById('connectivitySettingsMessage');
   const languagePresetSelect = document.getElementById('languagePresetSelect');
   const languageRulesList = document.getElementById('languageRulesList');
 
@@ -51,6 +55,7 @@
     loadRule();
     loadNoiseRules();
     loadBracketOptions();
+    loadConnectivitySettings();
     updatePresetOptions();
   }
 
@@ -151,6 +156,21 @@
     updatePresetOptions();
   }
 
+  function getNoiseRulesForCurrentLanguage() {
+    return Array.from(languageRulesList.querySelectorAll('.language-rule')).map(row => {
+      const preset = row.dataset.presetKey || 'custom';
+      const translationKey = `settings.preset${preset[0].toUpperCase()}${preset.slice(1)}`;
+      const translatedName = I18N.t(translationKey);
+      return {
+        name: preset !== 'custom' && translatedName !== translationKey
+          ? translatedName
+          : row.querySelector('.rule-name').value,
+        range: row.querySelector('.rule-range').value,
+        preset
+      };
+    });
+  }
+
   function getPresetKey(rule) {
     if (rule.preset && Object.hasOwn(PRESETS, rule.preset)) return rule.preset;
     const matchingPreset = Object.entries(PRESETS).find(([key, preset]) => {
@@ -214,6 +234,73 @@
       .map(option => option.dataset.bracketPair);
   }
 
+  function loadConnectivitySettings() {
+    let settings = { enabled: false, concurrency: 4 };
+    try {
+      const saved = JSON.parse(localStorage.getItem(CONNECTIVITY_STORAGE_KEY) || 'null');
+      if (saved && typeof saved === 'object') {
+        settings = {
+          enabled: saved.enabled === true,
+          concurrency: Number.isInteger(saved.concurrency)
+            ? Math.min(20, Math.max(1, saved.concurrency))
+            : 4
+        };
+      }
+    } catch {
+      // Use safe defaults if saved settings are unreadable.
+    }
+    connectivityEnabled.checked = settings.enabled;
+    connectivityConcurrency.value = String(settings.concurrency);
+  }
+
+  function saveConnectivitySettings(enabled = connectivityEnabled.checked) {
+    let concurrency = Number(connectivityConcurrency.value);
+    if (!Number.isInteger(concurrency) || concurrency < 1 || concurrency > 20) {
+      if (enabled) {
+        showMessage(connectivitySettingsMessage, I18N.t('settings.concurrencyInvalid'), true);
+        return false;
+      }
+      concurrency = 4;
+    }
+    connectivityConcurrency.value = String(concurrency);
+    localStorage.setItem(CONNECTIVITY_STORAGE_KEY, JSON.stringify({ enabled, concurrency }));
+    showMessage(connectivitySettingsMessage, I18N.t('settings.connectivitySaved'));
+    return true;
+  }
+
+  async function enableConnectivityChecks() {
+    const concurrency = Number(connectivityConcurrency.value);
+    if (!Number.isInteger(concurrency) || concurrency < 1 || concurrency > 20) {
+      connectivityEnabled.checked = false;
+      saveConnectivitySettings(false);
+      showMessage(connectivitySettingsMessage, I18N.t('settings.concurrencyInvalid'), true);
+      return;
+    }
+
+    const permissions = globalThis.browser?.permissions || globalThis.chrome?.permissions;
+    if (!permissions?.request) {
+      connectivityEnabled.checked = false;
+      saveConnectivitySettings(false);
+      showMessage(connectivitySettingsMessage, I18N.t('settings.permissionUnavailable'), true);
+      return;
+    }
+
+    try {
+      const granted = await permissions.request({ origins: ['http://*/*', 'https://*/*'] });
+      if (!granted) {
+        connectivityEnabled.checked = false;
+        saveConnectivitySettings(false);
+        showMessage(connectivitySettingsMessage, I18N.t('settings.permissionDenied'), true);
+        return;
+      }
+      if (!saveConnectivitySettings(true)) connectivityEnabled.checked = false;
+    } catch {
+      connectivityEnabled.checked = false;
+      saveConnectivitySettings(false);
+      showMessage(connectivitySettingsMessage, I18N.t('settings.permissionDenied'), true);
+    }
+  }
+
   function collectNoiseRules() {
     const rows = Array.from(languageRulesList.querySelectorAll('.language-rule'));
     const rules = [];
@@ -250,12 +337,26 @@
     syncAboutVersion();
     langSelect.value = I18N.getCurrentLang();
     document.getElementById('defaultRuleCode').textContent = `/${DEFAULT_PATTERN}/${DEFAULT_FLAGS}`;
+    renderNoiseRules(getNoiseRulesForCurrentLanguage());
     updatePresetOptions();
     showMessage(message, '');
+    showMessage(connectivitySettingsMessage, '');
   });
 
   themeSelect.addEventListener('change', () => {
     themeSelect.value = Theme.setPreference(themeSelect.value);
+  });
+
+  connectivityEnabled.addEventListener('change', () => {
+    if (connectivityEnabled.checked) {
+      enableConnectivityChecks();
+    } else {
+      saveConnectivitySettings(false);
+    }
+  });
+
+  connectivityConcurrency.addEventListener('change', () => {
+    saveConnectivitySettings();
   });
 
   document.getElementById('addLanguageRuleBtn').addEventListener('click', () => {

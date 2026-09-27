@@ -202,6 +202,26 @@
       text-decoration: underline;
     }
 
+    .connectivity-status {
+      width: fit-content;
+      padding: 3px 7px;
+      border-radius: 999px;
+      background: #eef2f7;
+      color: #5f6368;
+      font-size: 10px;
+      line-height: 1.4;
+    }
+
+    .connectivity-status[data-state="reachable"] {
+      background: #e6f4ea;
+      color: #137333;
+    }
+
+    .connectivity-status[data-state="error"] {
+      background: #fce8e6;
+      color: #b3261e;
+    }
+
     .link-actions {
       display: flex;
       justify-content: flex-end;
@@ -294,6 +314,21 @@
       html[data-theme="dark"] .empty-box {
         border-color: #68413f;
         background: #302322;
+        color: #ffaaa4;
+      }
+
+      html[data-theme="dark"] .connectivity-status {
+        background: #30343d;
+        color: #c4c9d2;
+      }
+
+      html[data-theme="dark"] .connectivity-status[data-state="reachable"] {
+        background: #1e3a2b;
+        color: #81c995;
+      }
+
+      html[data-theme="dark"] .connectivity-status[data-state="error"] {
+        background: #442b29;
         color: #ffaaa4;
       }
 

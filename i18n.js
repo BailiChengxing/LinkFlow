@@ -22,7 +22,16 @@ const I18N = (() => {
 
       const base = lang === 'en' ? {} : await loadLocale('en');
       const selected = await loadLocale(lang);
-      translations = mergeTranslations(base, selected);
+      let supplemental = {};
+      if (lang !== 'en') {
+        try {
+          const localeAdditions = await loadLocale('supplemental');
+          supplemental = localeAdditions[lang] || {};
+        } catch (error) {
+          console.warn('Failed to load supplemental translations for ' + lang, error);
+        }
+      }
+      translations = mergeTranslations(mergeTranslations(base, selected), supplemental);
       currentLang = lang;
       document.documentElement.lang = lang;
       document.documentElement.dir = lang === 'ar' ? 'rtl' : 'ltr';

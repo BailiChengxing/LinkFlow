@@ -34,5 +34,9 @@
   },
   "permissions": [
     "clipboardRead"
+  ],
+  "optional_host_permissions": [
+    "http://*/*",
+    "https://*/*"
   ]
 }

@@ -61,6 +61,8 @@
 
     resultCount.textContent = I18N.t('popup.resultCount', { count: cleanedLinks.length });
 
+    const connectivitySettings = getConnectivitySettings();
+    const connectivityBadges = [];
     cleanedLinks.forEach(url => {
       const card = document.createElement('div');
       card.className = 'link-card';
@@ -68,6 +70,13 @@
       const linkText = document.createElement('span');
       linkText.className = 'link-text';
       linkText.textContent = url;
+
+      const connectivityBadge = document.createElement('span');
+      connectivityBadge.className = 'connectivity-status';
+      if (connectivitySettings.enabled) {
+        connectivityBadge.textContent = I18N.t('popup.connectivityChecking');
+        connectivityBadges.push({ url, element: connectivityBadge });
+      }
 
       const btnGroup = document.createElement('div');
       btnGroup.className = 'link-actions';
@@ -94,11 +103,86 @@
       btnGroup.appendChild(openBtn);
       btnGroup.appendChild(copyBtn);
       card.appendChild(linkText);
+      if (connectivitySettings.enabled) card.appendChild(connectivityBadge);
       card.appendChild(btnGroup);
 
       linksContainer.appendChild(card);
     });
+
+    if (connectivitySettings.enabled) {
+      runConnectivityTests(connectivityBadges, connectivitySettings.concurrency);
+    }
   });
+
+  function getConnectivitySettings() {
+    try {
+      const saved = JSON.parse(localStorage.getItem('linkflow.connectivityTest') || 'null');
+      return {
+        enabled: saved?.enabled === true,
+        concurrency: Number.isInteger(saved?.concurrency)
+          ? Math.min(20, Math.max(1, saved.concurrency))
+          : 4
+      };
+    } catch {
+      return { enabled: false, concurrency: 4 };
+    }
+  }
+
+  async function runConnectivityTests(items, concurrency) {
+    const permissions = globalThis.browser?.permissions || globalThis.chrome?.permissions;
+    if (!permissions?.contains) {
+      items.forEach(({ element }) => setConnectivityBadge(element, 'connectivityPermissionMissing', 'error'));
+      return;
+    }
+
+    try {
+      const hasPermission = await permissions.contains({ origins: ['http://*/*', 'https://*/*'] });
+      if (!hasPermission) {
+        items.forEach(({ element }) => setConnectivityBadge(element, 'connectivityPermissionMissing', 'error'));
+        return;
+      }
+    } catch {
+      items.forEach(({ element }) => setConnectivityBadge(element, 'connectivityPermissionMissing', 'error'));
+      return;
+    }
+
+    let nextIndex = 0;
+    async function worker() {
+      while (nextIndex < items.length) {
+        const item = items[nextIndex];
+        nextIndex += 1;
+        await checkConnectivity(item.url, item.element);
+      }
+    }
+
+    const workerCount = Math.min(items.length, Math.max(1, Math.min(20, concurrency)));
+    await Promise.all(Array.from({ length: workerCount }, () => worker()));
+  }
+
+  async function checkConnectivity(url, badge) {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 8000);
+    try {
+      const response = await fetch(url, {
+        method: 'HEAD',
+        cache: 'no-store',
+        credentials: 'omit',
+        redirect: 'follow',
+        signal: controller.signal
+      });
+      setConnectivityBadge(badge, 'connectivityReachable', 'reachable', { status: response.status });
+    } catch {
+      setConnectivityBadge(badge, controller.signal.aborted ? 'connectivityTimedOut' : 'connectivityUnreachable', 'error');
+    } finally {
+      clearTimeout(timeout);
+    }
+  }
+
+  function setConnectivityBadge(element, translationKey, state, params) {
+    element.textContent = I18N.t(`popup.${translationKey}`, params);
+    element.dataset.state = state;
+    element.setAttribute('role', 'status');
+  }
 
   function getUrlRegex() {
     const defaultRegex = /(?:https?:\/\/)?(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z]{2,}(?::\d{1,5})?(?:[/?#][^\s<>"'{}|\\^`\[\]]*)?/gi;

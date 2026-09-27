@@ -372,6 +372,55 @@
       gap: 5px;
     }
 
+    .test-setting-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 14px 0;
+      border-bottom: 1px solid #edf0f5;
+    }
+
+    .test-setting-row:last-of-type {
+      border-bottom: 0;
+    }
+
+    .test-setting-copy {
+      display: grid;
+      gap: 4px;
+    }
+
+    .test-setting-copy strong {
+      font-size: 14px;
+    }
+
+    .test-setting-copy span,
+    .test-permission-note {
+      color: #70757a;
+      font-size: 12px;
+      line-height: 1.6;
+    }
+
+    .test-setting-row input[type="checkbox"] {
+      width: 18px;
+      height: 18px;
+      flex: 0 0 auto;
+      accent-color: #1a73e8;
+    }
+
+    .concurrency-input {
+      width: 100px;
+    }
+
+    html[data-theme="dark"] .test-setting-row {
+      border-color: #343944;
+    }
+
+    html[data-theme="dark"] .test-setting-copy span,
+    html[data-theme="dark"] .test-permission-note {
+      color: #aeb4c0;
+    }
+
     .nav-item {
       display: flex;
       align-items: center;
@@ -591,7 +640,7 @@
       }
 
       .side-nav {
-        grid-template-columns: repeat(3, 1fr);
+        grid-template-columns: repeat(4, minmax(0, 1fr));
       }
 
       .nav-item {
@@ -865,9 +914,10 @@
         <span data-i18n="settings.brandText">清链助手</span>
       </div>
       <p class="side-caption" data-i18n="settings.menuCaption">设置</p>
-      <nav class="side-nav" aria-label="Settings sections">
+      <nav class="side-nav" data-i18n-aria="settings.sectionsLabel" aria-label="设置栏目">
         <button class="nav-item" type="button" data-section="general" aria-current="page"><span class="nav-icon" aria-hidden="true">⚙</span><span data-i18n="settings.navGeneral">通用</span></button>
         <button class="nav-item" type="button" data-section="language"><span class="nav-icon" aria-hidden="true">文</span><span data-i18n="settings.navLanguage">语言</span></button>
+        <button class="nav-item" type="button" data-section="test"><span class="nav-icon" aria-hidden="true">✓</span><span data-i18n="settings.navTest">测试</span></button>
         <button class="nav-item" type="button" data-section="about"><span class="nav-icon" aria-hidden="true">ⓘ</span><span data-i18n="settings.navAbout">关于</span></button>
       </nav>
       <p class="sidebar-footer" data-i18n="settings.privacyNote">偏好设置仅保存在本地浏览器</p>
@@ -909,7 +959,7 @@
             <h3 class="setting-subtitle" data-i18n="settings.noiseRulesTitle">混入字符清理列表</h3>
             <p class="quick-lang-desc" data-i18n="settings.noiseRulesDesc">提取前会移除已启用字符范围中的字符。可按需添加或删除；规则仅匹配字符，不会移除 URL 分隔符。</p>
             <div class="language-actions">
-              <select id="languagePresetSelect" class="lang-select" aria-label="Language character set">
+              <select id="languagePresetSelect" class="lang-select" data-i18n-aria="settings.characterSetLabel" aria-label="字符集">
                 <option value="japanese" data-i18n="settings.presetJapanese">日文</option>
                 <option value="chinese" data-i18n="settings.presetChinese">中文</option>
                 <option value="korean" data-i18n="settings.presetKorean">韩文</option>
@@ -989,6 +1039,31 @@
             </select>
           </div>
 
+        </div>
+      </section>
+
+      <section id="section-test" class="settings-section" aria-labelledby="testTitle" hidden>
+        <header class="page-heading">
+          <h1 id="testTitle" data-i18n="settings.testTitle">连通性测试</h1>
+          <p class="intro" data-i18n="settings.testIntro">提取链接后可选检查链接是否有响应。</p>
+        </header>
+        <div class="panel">
+          <div class="test-setting-row">
+            <div class="test-setting-copy">
+              <strong data-i18n="settings.connectivityEnable">启用链接连通性测试</strong>
+              <span data-i18n="settings.connectivityEnableDesc">提取完成后向每个链接发送请求并显示测试结果。</span>
+            </div>
+            <input id="connectivityEnabled" type="checkbox" data-i18n-aria="settings.connectivityEnable" aria-label="启用链接连通性测试">
+          </div>
+          <div class="test-setting-row">
+            <label class="test-setting-copy" for="connectivityConcurrency">
+              <strong data-i18n="settings.concurrencyLabel">最大并发数</strong>
+              <span data-i18n="settings.concurrencyDesc">同时进行的连通性请求数量（1–20）。</span>
+            </label>
+            <input id="connectivityConcurrency" class="concurrency-input" type="number" min="1" max="20" step="1" value="4">
+          </div>
+          <p class="test-permission-note" data-i18n="settings.connectivityPermission">启用时浏览器会请求访问 HTTP/HTTPS 网站的可选权限；关闭功能后不会发送测试请求。</p>
+          <p id="connectivitySettingsMessage" class="message" role="status" aria-live="polite"></p>
         </div>
       </section>
 
