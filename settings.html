@@ -243,6 +243,17 @@
       white-space: nowrap;
     }
 
+    .history-limit-row {
+      justify-content: space-between;
+      margin: 10px 0 14px;
+      padding: 0 0 16px;
+    }
+
+    .history-limit-row .lang-select {
+      flex: 0 0 220px;
+      width: 220px;
+    }
+
     .lang-select {
       width: min(100%, 260px);
       min-height: 42px;
@@ -862,6 +873,20 @@
         flex-wrap: wrap;
       }
 
+      .history-limit-row {
+        flex-wrap: nowrap;
+        gap: 10px;
+      }
+
+      .history-limit-row .field-label {
+        white-space: normal;
+      }
+
+      .history-limit-row .lang-select {
+        flex: 0 1 180px;
+        width: min(100%, 180px);
+      }
+
       .history-heading,
       .history-row {
         grid-template-columns: minmax(0, 1fr) minmax(90px, 0.7fr) auto;
@@ -1253,7 +1278,7 @@
           <section class="setting-block">
             <h2 class="setting-block-title" data-i18n="settings.retentionTitle">有效时间</h2>
             <p class="quick-lang-desc" data-i18n="settings.retentionDesc">设置弹窗中原始输入和提取结果的保留时间。</p>
-            <div class="lang-row">
+            <div class="lang-row history-limit-row">
               <label class="field-label" for="contentRetention" data-i18n="settings.retentionTitle">有效时间</label>
               <select id="contentRetention" class="lang-select">
                 <option value="never" data-i18n="settings.retentionNever">不删除</option>
