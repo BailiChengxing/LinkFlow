@@ -87,9 +87,6 @@ const I18N = (() => {
     document.querySelectorAll('[data-i18n]').forEach(function(el) {
       el.textContent = t(el.getAttribute('data-i18n'));
     });
-    document.querySelectorAll('[data-i18n-html]').forEach(function(el) {
-      el.innerHTML = t(el.getAttribute('data-i18n-html'));
-    });
     document.querySelectorAll('[data-i18n-placeholder]').forEach(function(el) {
       el.placeholder = t(el.getAttribute('data-i18n-placeholder'));
     });

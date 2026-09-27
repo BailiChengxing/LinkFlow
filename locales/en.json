@@ -29,7 +29,7 @@
     "resetBtn": "Reset to Default",
     "defaultRuleDesc": "Matches domains with or without http/https, and extracts port, path, query parameters, and hash fragments. The global flag g is auto-enabled.",
     "patternLabel": "Regular Expression",
-    "patternHelp": "Enter the regex body without surrounding slashes. Example: <code>https?:\\/\\/example\\.com\\/\\S+</code>",
+    "patternHelp": "Enter the regex body without surrounding slashes. Example: https?:\\/\\/example\\.com\\/\\S+",
     "flagsLabel": "Flags",
     "flagsHelp": "g (global) is auto-enabled; common flags: i case-insensitive, m multiline, s dotAll, u Unicode.",
     "saveBtn": "Save Rule",

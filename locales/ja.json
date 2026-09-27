@@ -29,7 +29,7 @@
     "resetBtn": "デフォルトに戻す",
     "defaultRuleDesc": "http/https の有無にかかわらずドメインをマッチし、ポート、パス、クエリパラメータ、ハッシュフラグメントを抽出します。グローバルフラグgは自動有効になります。",
     "patternLabel": "正規表現",
-    "patternHelp": "スラッシュを含めずに正規表現本体を入力してください。例：<code>https?:\\/\\/example\\.com\\/\\S+</code>",
+    "patternHelp": "スラッシュを含めずに正規表現本体を入力してください。例： https?:\\/\\/example\\.com\\/\\S+",
     "flagsLabel": "フラグ",
     "flagsHelp": "g（グローバル）は自動有効；一般的なフラグ：i 大文字小文字区別なし、m 複数行、s ドット改行マッチ、u Unicode。",
     "saveBtn": "ルールを保存",

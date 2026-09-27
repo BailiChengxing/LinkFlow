@@ -29,7 +29,7 @@
     "resetBtn": "恢复默认",
     "defaultRuleDesc": "匹配带或不带 http/https 的域名，并提取端口、路径、查询参数及哈希片段。全局匹配标记 g 会自动启用。",
     "patternLabel": "正则表达式",
-    "patternHelp": "输入正则表达式主体，不需要包含两侧的斜杠。例如：<code>https?:\\/\\/example\\.com\\/\\S+</code>",
+    "patternHelp": "输入正则表达式主体，不需要包含两侧的斜杠。例如： https?:\\/\\/example\\.com\\/\\S+",
     "flagsLabel": "标记",
     "flagsHelp": "g（全局）会自动启用；常用标记：i 不区分大小写、m 多行、s 点号匹配换行、u Unicode。",
     "saveBtn": "保存规则",

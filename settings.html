@@ -677,18 +677,18 @@
           <span data-i18n="settings.defaultRuleLabel">默认规则</span>
           <button id="resetBtn" class="secondary-btn" type="button" data-i18n="settings.resetBtn">恢复默认</button>
         </div>
-        <p data-i18n-html="settings.defaultRuleDesc">匹配带或不带 http/https 的域名，并提取端口、路径、查询参数及哈希片段。全局匹配标记 g 会自动启用。</p>
+        <p data-i18n="settings.defaultRuleDesc">匹配带或不带 http/https 的域名，并提取端口、路径、查询参数及哈希片段。全局匹配标记 g 会自动启用。</p>
         <pre id="defaultRuleCode" class="default-code"></pre>
       </div>
 
           <label class="field-label" for="patternInput" data-i18n="settings.patternLabel">正则表达式</label>
       <textarea id="patternInput" spellcheck="false" autocapitalize="off" autocomplete="off" aria-describedby="patternHelp"></textarea>
-      <p id="patternHelp" class="help-text" data-i18n-html="settings.patternHelp">输入正则表达式主体，不需要包含两侧的斜杠。例如：<code>https?:\/\/example\.com\/\S+</code></p>
+      <p id="patternHelp" class="help-text" data-i18n="settings.patternHelp">输入正则表达式主体，不需要包含两侧的斜杠。例如： https?:\/\/example\.com\/\S+</p>
 
       <div class="flags-row">
         <label class="field-label" for="flagsInput" data-i18n="settings.flagsLabel">标记</label>
         <input id="flagsInput" type="text" value="gi" spellcheck="false" autocapitalize="off" autocomplete="off" aria-describedby="flagsHelp">
-        <span id="flagsHelp" class="flags-hint" data-i18n-html="settings.flagsHelp">g（全局）会自动启用；常用标记：i 不区分大小写、m 多行、s 点号匹配换行、u Unicode。</span>
+        <span id="flagsHelp" class="flags-hint" data-i18n="settings.flagsHelp">g（全局）会自动启用；常用标记：i 不区分大小写、m 多行、s 点号匹配换行、u Unicode。</span>
       </div>
 
           <h2 class="quick-lang-heading" data-i18n="settings.noiseRulesTitle">混入字符清理列表</h2>
