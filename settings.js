@@ -22,8 +22,8 @@
   const resetBtn = document.getElementById('resetBtn');
   const message = document.getElementById('message');
   const langSelect = document.getElementById('langSelect');
+  const languagePresetSelect = document.getElementById('languagePresetSelect');
   const languageRulesList = document.getElementById('languageRulesList');
-  const languageMessage = document.getElementById('languageMessage');
 
   async function initPage() {
     await I18N.init();
@@ -31,6 +31,7 @@
     langSelect.value = I18N.getCurrentLang();
     loadRule();
     loadNoiseRules();
+    updatePresetOptions();
   }
 
   function normalizedFlags(flags) {
@@ -50,10 +51,12 @@
     element.classList.toggle('error', isError);
   }
 
-  function saveRule() {
+  function saveAllSettings() {
     try {
       const rule = validateRule();
+      const noiseRules = collectNoiseRules();
       localStorage.setItem(REGEX_STORAGE_KEY, JSON.stringify(rule));
+      localStorage.setItem(NOISE_STORAGE_KEY, JSON.stringify(noiseRules));
       flagsInput.value = rule.flags;
       showMessage(message, I18N.t('settings.saveSuccess'));
     } catch (error) {
@@ -90,6 +93,7 @@
   function makeRuleRow(rule = {}) {
     const row = document.createElement('div');
     row.className = 'language-rule';
+    row.dataset.presetKey = getPresetKey(rule);
 
     const nameInput = document.createElement('input');
     nameInput.type = 'text';
@@ -110,7 +114,10 @@
     deleteButton.type = 'button';
     deleteButton.className = 'delete-rule-btn';
     deleteButton.textContent = I18N.t('settings.deleteLanguageRule');
-    deleteButton.addEventListener('click', () => row.remove());
+    deleteButton.addEventListener('click', () => {
+      row.remove();
+      updatePresetOptions();
+    });
 
     row.append(nameInput, rangeInput, deleteButton);
     return row;
@@ -119,6 +126,39 @@
   function renderNoiseRules(rules) {
     languageRulesList.textContent = '';
     rules.forEach(rule => languageRulesList.appendChild(makeRuleRow(rule)));
+    updatePresetOptions();
+  }
+
+  function getPresetKey(rule) {
+    if (rule.preset && Object.hasOwn(PRESETS, rule.preset)) return rule.preset;
+    const matchingPreset = Object.entries(PRESETS).find(([key, preset]) => {
+      return key !== 'custom' && preset.range === rule.range;
+    });
+    return matchingPreset ? matchingPreset[0] : 'custom';
+  }
+
+  function updatePresetOptions() {
+    const usedPresets = new Set(
+      Array.from(languageRulesList.querySelectorAll('.language-rule'))
+        .map(row => row.dataset.presetKey)
+        .filter(key => key && key !== 'custom')
+    );
+    const previousSelection = languagePresetSelect.value;
+    const availableKeys = Object.keys(PRESETS).filter(key => key === 'custom' || !usedPresets.has(key));
+
+    languagePresetSelect.textContent = '';
+    availableKeys.forEach(key => {
+      const option = document.createElement('option');
+      const translationKey = `settings.preset${key[0].toUpperCase()}${key.slice(1)}`;
+      const translatedName = I18N.t(translationKey);
+      option.value = key;
+      option.textContent = translatedName === translationKey ? (PRESETS[key].name || key) : translatedName;
+      languagePresetSelect.appendChild(option);
+    });
+
+    languagePresetSelect.value = availableKeys.includes(previousSelection)
+      ? previousSelection
+      : (availableKeys[0] || 'custom');
   }
 
   function loadNoiseRules() {
@@ -131,23 +171,27 @@
     } catch {
       // Use the built-in Chinese range if saved settings are unreadable.
     }
-    renderNoiseRules([{ name: PRESETS.chinese.name, range: PRESETS.chinese.range }]);
+    renderNoiseRules([{ name: PRESETS.chinese.name, range: PRESETS.chinese.range, preset: 'chinese' }]);
   }
 
-  function saveNoiseRules() {
+  function collectNoiseRules() {
     const rows = Array.from(languageRulesList.querySelectorAll('.language-rule'));
     const rules = [];
+    const usedPresets = new Set();
     for (const row of rows) {
       const name = row.querySelector('.rule-name').value.trim();
       const range = row.querySelector('.rule-range').value.trim();
       if (!name || !range || !validateCharacterRange(range)) {
-        showMessage(languageMessage, I18N.t('settings.invalidLanguageRule'), true);
-        return;
+        throw new Error(I18N.t('settings.invalidLanguageRule'));
       }
-      rules.push({ name, range });
+      const preset = row.dataset.presetKey || 'custom';
+      if (preset !== 'custom' && usedPresets.has(preset)) {
+        throw new Error(I18N.t('settings.duplicateLanguageRule'));
+      }
+      if (preset !== 'custom') usedPresets.add(preset);
+      rules.push({ name, range, preset });
     }
-    localStorage.setItem(NOISE_STORAGE_KEY, JSON.stringify(rules));
-    showMessage(languageMessage, I18N.t('settings.languageRulesSaved'));
+    return rules;
   }
 
   document.querySelectorAll('.nav-item').forEach(item => {
@@ -165,28 +209,35 @@
     await I18N.init();
     langSelect.value = I18N.getCurrentLang();
     document.getElementById('defaultRuleCode').textContent = `/${DEFAULT_PATTERN}/${DEFAULT_FLAGS}`;
+    updatePresetOptions();
     showMessage(message, '');
-    showMessage(languageMessage, '');
   });
 
   document.getElementById('addLanguageRuleBtn').addEventListener('click', () => {
-    const presetKey = document.getElementById('languagePresetSelect').value;
+    const presetKey = languagePresetSelect.value;
+    const usedPresets = new Set(
+      Array.from(languageRulesList.querySelectorAll('.language-rule')).map(row => row.dataset.presetKey)
+    );
+    if (presetKey !== 'custom' && usedPresets.has(presetKey)) {
+      updatePresetOptions();
+      showMessage(message, I18N.t('settings.duplicateLanguageRule'), true);
+      return;
+    }
     const preset = PRESETS[presetKey] || PRESETS.custom;
     const translatedName = I18N.t(`settings.preset${presetKey[0].toUpperCase()}${presetKey.slice(1)}`);
     const name = presetKey === 'custom' ? '' : (translatedName.startsWith('settings.') ? preset.name : translatedName);
-    const row = makeRuleRow({ name, range: preset.range });
+    const row = makeRuleRow({ name, range: preset.range, preset: presetKey });
     languageRulesList.appendChild(row);
+    updatePresetOptions();
     row.querySelector(presetKey === 'custom' ? '.rule-name' : '.rule-range').focus();
-    showMessage(languageMessage, '');
+    showMessage(message, '');
   });
 
-  document.getElementById('saveLanguageRulesBtn').addEventListener('click', saveNoiseRules);
-
-  saveBtn.addEventListener('click', saveRule);
+  saveBtn.addEventListener('click', saveAllSettings);
   resetBtn.addEventListener('click', () => {
     patternInput.value = DEFAULT_PATTERN;
     flagsInput.value = DEFAULT_FLAGS;
-    saveRule();
+    showMessage(message, '');
   });
 
   patternInput.addEventListener('input', () => showMessage(message, ''));
