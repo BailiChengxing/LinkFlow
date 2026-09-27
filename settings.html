@@ -412,6 +412,146 @@
       width: 100px;
     }
 
+    .danger-zone {
+      margin-top: 18px;
+      padding: 18px 20px;
+      border: 1px solid #f1b7b2;
+      border-radius: 12px;
+      background: #fff8f7;
+    }
+
+    .danger-zone h2 {
+      margin: 0 0 6px;
+      color: #b3261e;
+      font-size: 17px;
+    }
+
+    .danger-zone p {
+      margin: 0 0 14px;
+      color: #6f5b59;
+      font-size: 12px;
+      line-height: 1.6;
+    }
+
+    .danger-btn {
+      min-height: 40px;
+      padding: 9px 16px;
+      border: 1px solid #b3261e;
+      border-radius: 9px;
+      background: #b3261e;
+      color: #fff;
+      font: inherit;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .danger-btn:hover {
+      border-color: #8c1d18;
+      background: #8c1d18;
+    }
+
+    .danger-btn:focus-visible {
+      outline: 3px solid rgba(179, 38, 30, 0.28);
+      outline-offset: 2px;
+    }
+
+    .history-list {
+      display: grid;
+      gap: 8px;
+      margin-top: 14px;
+    }
+
+    .history-row,
+    .history-heading {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(150px, 0.7fr) auto;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .history-heading {
+      padding: 0 10px 6px;
+      color: #70757a;
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .history-row {
+      min-height: 46px;
+      padding: 7px 10px;
+      border: 1px solid #e4e8f0;
+      border-radius: 9px;
+      background: #fff;
+    }
+
+    .history-link,
+    .history-time {
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      font-size: 12px;
+    }
+
+    .history-link {
+      color: #1a73e8;
+      font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+    }
+
+    .history-time {
+      color: #5f6368;
+    }
+
+    .history-empty {
+      margin: 8px 0;
+      color: #70757a;
+      font-size: 13px;
+    }
+
+    .history-pagination {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 14px;
+      margin-top: 14px;
+    }
+
+    .history-page-label {
+      color: #5f6368;
+      font-size: 12px;
+    }
+
+    html[data-theme="dark"] .history-row {
+      border-color: #343944;
+      background: #1b1e25;
+    }
+
+    html[data-theme="dark"] .history-heading,
+    html[data-theme="dark"] .history-time,
+    html[data-theme="dark"] .history-empty,
+    html[data-theme="dark"] .history-page-label {
+      color: #aeb4c0;
+    }
+
+    html[data-theme="dark"] .danger-zone {
+      border-color: #68413f;
+      background: #302322;
+    }
+
+    html[data-theme="dark"] .danger-zone h2 {
+      color: #ffaaa4;
+    }
+
+    html[data-theme="dark"] .danger-zone p {
+      color: #d0aaa6;
+    }
+
+    .lang-select:disabled {
+      opacity: 0.58;
+      cursor: not-allowed;
+    }
+
     html[data-theme="dark"] .test-setting-row {
       border-color: #343944;
     }
@@ -693,6 +833,17 @@
 
       .lang-row {
         flex-wrap: wrap;
+      }
+
+      .history-heading,
+      .history-row {
+        grid-template-columns: minmax(0, 1fr) minmax(90px, 0.7fr) auto;
+        gap: 7px;
+      }
+
+      .history-link,
+      .history-time {
+        font-size: 11px;
       }
     }
 
@@ -1081,7 +1232,42 @@
             </div>
             <p id="retentionSettingsMessage" class="message" role="status" aria-live="polite"></p>
           </section>
+
+          <section class="setting-block">
+            <h2 class="setting-block-title" data-i18n="settings.historyTitle">历史记录</h2>
+            <div class="test-setting-row">
+              <div class="test-setting-copy">
+                <strong data-i18n="settings.historyEnable">启用历史记录</strong>
+                <span data-i18n="settings.historyEnableDesc">每次提取后保存链接及提取时间，仅保存在本地。</span>
+              </div>
+              <input id="historyEnabled" type="checkbox" data-i18n-aria="settings.historyEnable" aria-label="启用历史记录">
+            </div>
+            <div class="lang-row">
+              <label class="field-label" for="historyLimit" data-i18n="settings.historyLimitLabel">保留记录数</label>
+              <select id="historyLimit" class="lang-select">
+                <option value="50" data-i18n="settings.historyLimit50">50 条</option>
+                <option value="80" data-i18n="settings.historyLimit80">80 条</option>
+              </select>
+            </div>
+            <p id="historySettingsMessage" class="message" role="status" aria-live="polite"></p>
+            <div class="history-heading" aria-hidden="true">
+              <span data-i18n="settings.historyLinkLabel">链接</span>
+              <span data-i18n="settings.historyTimeLabel">提取时间</span>
+              <span data-i18n="settings.historyActionLabel">操作</span>
+            </div>
+            <div id="historyList" class="history-list" aria-live="polite"></div>
+            <div id="historyPagination" class="history-pagination" hidden>
+              <button id="historyPrevious" class="secondary-btn" type="button" data-i18n="settings.historyPrevious">上一页</button>
+              <span id="historyPageLabel" class="history-page-label"></span>
+              <button id="historyNext" class="secondary-btn" type="button" data-i18n="settings.historyNext">下一页</button>
+            </div>
+          </section>
         </div>
+        <section class="danger-zone" aria-labelledby="clearStorageTitle">
+          <h2 id="clearStorageTitle" data-i18n="settings.clearStorageTitle">清理储存空间</h2>
+          <p data-i18n="settings.clearStorageDesc">清除本扩展保存的全部设置、输入内容和历史记录。</p>
+          <button id="clearStorageBtn" class="danger-btn" type="button" data-i18n="settings.clearStorageBtn">清理储存空间</button>
+        </section>
       </section>
 
       <section id="section-about" class="settings-section" aria-labelledby="aboutTitle" hidden>
@@ -1097,6 +1283,7 @@
             <li data-i18n="settings.aboutRegex">匹配规则和语言字符清理列表可按个人需要配置。</li>
             <li data-i18n="settings.aboutValidity">可选测试提取链接的有效性，并设置测试并发数。</li>
             <li data-i18n="settings.aboutRetention">可设置弹窗输入和提取结果的保留时间：不删除、关闭浏览器后删除或每次使用后删除。</li>
+            <li data-i18n="settings.aboutHistory">可选启用历史记录，保存提取链接和时间，并在更多页面分页查看。</li>
             <li data-i18n="settings.aboutVersion">版本：1.1.5</li>
           </ul>
           <p><a class="github-link" href="https://github.com/BailiChengxing/LinkFlow" target="_blank" rel="noopener noreferrer"><span class="github-icon" aria-hidden="true">↗</span><span data-i18n="settings.aboutGithub">GitHub 项目主页</span></a></p>

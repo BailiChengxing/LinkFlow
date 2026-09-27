@@ -12,6 +12,8 @@
   const status = document.getElementById('status');
   const POPUP_STATE_KEY = 'linkflow.popupState';
   const SESSION_MARKER_KEY = 'linkflow.popupSessionStarted';
+  const HISTORY_SETTINGS_KEY = 'linkflow.historySettings';
+  const HISTORY_STORAGE_KEY = 'linkflow.extractionHistory';
   const popupState = { input: '', links: [], emptyMessageKey: 'popup.emptyWaiting' };
 
   await preparePopupState();
@@ -96,6 +98,8 @@
       renderEmpty(I18N.t('popup.emptyNoResult'));
       return;
     }
+
+    recordExtractionHistory(cleanedLinks);
 
     const connectivitySettings = getConnectivitySettings();
     popupState.links = cleanedLinks.map(url => ({
@@ -196,6 +200,23 @@
   function getContentRetention() {
     const setting = localStorage.getItem('linkflow.contentRetention');
     return ['never', 'browser', 'after-use'].includes(setting) ? setting : 'browser';
+  }
+
+  function recordExtractionHistory(links) {
+    try {
+      const settings = JSON.parse(localStorage.getItem(HISTORY_SETTINGS_KEY) || 'null');
+      if (settings?.enabled !== true) return;
+      const limit = settings.limit === 80 ? 80 : 50;
+      const previous = JSON.parse(localStorage.getItem(HISTORY_STORAGE_KEY) || '[]');
+      const history = Array.isArray(previous)
+        ? previous.filter(item => item && typeof item.url === 'string' && Number.isFinite(item.extractedAt))
+        : [];
+      const extractedAt = Date.now();
+      const additions = links.map(url => ({ url, extractedAt }));
+      localStorage.setItem(HISTORY_STORAGE_KEY, JSON.stringify([...additions, ...history].slice(0, limit)));
+    } catch {
+      // History is optional; storage failures should not interrupt extraction.
+    }
   }
 
   function savePopupState() {

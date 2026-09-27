@@ -4,6 +4,9 @@
   const BRACKET_STORAGE_KEY = 'linkflow.bracketCleanup';
   const CONNECTIVITY_STORAGE_KEY = 'linkflow.connectivityTest';
   const RETENTION_STORAGE_KEY = 'linkflow.contentRetention';
+  const HISTORY_SETTINGS_KEY = 'linkflow.historySettings';
+  const HISTORY_STORAGE_KEY = 'linkflow.extractionHistory';
+  const HISTORY_PAGE_SIZE = 10;
   const DEFAULT_PATTERN = "(?:https?:\\/\\/)?(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\\.)+[a-z]{2,}(?::\\d{1,5})?(?:[/?#][^\\s<>\"'{}|\\\\^`\\[\\]]*)?";
   const DEFAULT_FLAGS = 'gi';
   const PRESETS = {
@@ -31,6 +34,16 @@
   const connectivitySettingsMessage = document.getElementById('connectivitySettingsMessage');
   const contentRetention = document.getElementById('contentRetention');
   const retentionSettingsMessage = document.getElementById('retentionSettingsMessage');
+  const historyEnabled = document.getElementById('historyEnabled');
+  const historyLimit = document.getElementById('historyLimit');
+  const historySettingsMessage = document.getElementById('historySettingsMessage');
+  const historyList = document.getElementById('historyList');
+  const historyPagination = document.getElementById('historyPagination');
+  const historyPrevious = document.getElementById('historyPrevious');
+  const historyNext = document.getElementById('historyNext');
+  const historyPageLabel = document.getElementById('historyPageLabel');
+  const clearStorageBtn = document.getElementById('clearStorageBtn');
+  let currentHistoryPage = 0;
   const languagePresetSelect = document.getElementById('languagePresetSelect');
   const languageRulesList = document.getElementById('languageRulesList');
 
@@ -60,6 +73,8 @@
     loadBracketOptions();
     loadConnectivitySettings();
     loadRetentionSettings();
+    loadHistorySettings();
+    renderHistory();
     updatePresetOptions();
   }
 
@@ -283,6 +298,133 @@
     showMessage(retentionSettingsMessage, I18N.t('settings.retentionSaved'));
   }
 
+  function getHistorySettings() {
+    try {
+      const saved = JSON.parse(localStorage.getItem(HISTORY_SETTINGS_KEY) || 'null');
+      return {
+        enabled: saved?.enabled === true,
+        limit: saved?.limit === 80 ? 80 : 50
+      };
+    } catch {
+      return { enabled: false, limit: 50 };
+    }
+  }
+
+  function loadHistorySettings() {
+    const settings = getHistorySettings();
+    historyEnabled.checked = settings.enabled;
+    historyLimit.value = String(settings.limit);
+    historyLimit.disabled = !settings.enabled;
+  }
+
+  function getExtractionHistory() {
+    try {
+      const saved = JSON.parse(localStorage.getItem(HISTORY_STORAGE_KEY) || '[]');
+      return Array.isArray(saved)
+        ? saved.filter(item => item && typeof item.url === 'string' && Number.isFinite(item.extractedAt))
+        : [];
+    } catch {
+      return [];
+    }
+  }
+
+  function saveHistorySettings() {
+    const settings = { enabled: historyEnabled.checked, limit: Number(historyLimit.value) === 80 ? 80 : 50 };
+    localStorage.setItem(HISTORY_SETTINGS_KEY, JSON.stringify(settings));
+    historyLimit.value = String(settings.limit);
+    historyLimit.disabled = !settings.enabled;
+    const entries = getExtractionHistory().slice(0, settings.limit);
+    localStorage.setItem(HISTORY_STORAGE_KEY, JSON.stringify(entries));
+    currentHistoryPage = Math.min(currentHistoryPage, Math.max(0, Math.ceil(entries.length / HISTORY_PAGE_SIZE) - 1));
+    showMessage(historySettingsMessage, I18N.t('settings.historySaved'));
+    renderHistory();
+  }
+
+  async function clearAllStoredData() {
+    localStorage.clear();
+    const browserStorage = globalThis.browser?.storage;
+    if (browserStorage) {
+      await Promise.all(['local', 'sync', 'session'].map(async areaName => {
+        try {
+          await browserStorage[areaName]?.clear();
+        } catch {
+          // Continue clearing other areas when a browser does not expose one.
+        }
+      }));
+    } else {
+      const chromeStorage = globalThis.chrome?.storage;
+      if (chromeStorage) {
+        await Promise.all(['local', 'sync', 'session'].map(areaName => new Promise(resolve => {
+          const area = chromeStorage[areaName];
+          if (!area?.clear) {
+            resolve();
+            return;
+          }
+          try {
+            area.clear(() => {
+              void globalThis.chrome?.runtime?.lastError;
+              resolve();
+            });
+          } catch {
+            resolve();
+          }
+        })));
+      }
+    }
+    window.location.reload();
+  }
+
+  function renderHistory() {
+    const history = getExtractionHistory();
+    const pageCount = Math.max(1, Math.ceil(history.length / HISTORY_PAGE_SIZE));
+    currentHistoryPage = Math.min(currentHistoryPage, pageCount - 1);
+    const pageItems = history.slice(currentHistoryPage * HISTORY_PAGE_SIZE, (currentHistoryPage + 1) * HISTORY_PAGE_SIZE);
+    historyList.textContent = '';
+
+    if (pageItems.length === 0) {
+      const empty = document.createElement('p');
+      empty.className = 'history-empty';
+      empty.textContent = I18N.t('settings.historyEmpty');
+      historyList.appendChild(empty);
+    } else {
+      pageItems.forEach(item => {
+        const row = document.createElement('div');
+        row.className = 'history-row';
+
+        const link = document.createElement('span');
+        link.className = 'history-link';
+        link.textContent = item.url;
+        link.title = item.url;
+
+        const time = document.createElement('time');
+        time.className = 'history-time';
+        time.dateTime = new Date(item.extractedAt).toISOString();
+        time.textContent = new Intl.DateTimeFormat(I18N.getCurrentLang(), {
+          dateStyle: 'short',
+          timeStyle: 'short'
+        }).format(new Date(item.extractedAt));
+
+        const open = document.createElement('button');
+        open.type = 'button';
+        open.className = 'secondary-btn';
+        open.textContent = I18N.t('settings.historyOpen');
+        open.addEventListener('click', () => {
+          const runtime = globalThis.browser?.tabs || globalThis.chrome?.tabs;
+          if (runtime?.create) runtime.create({ url: item.url });
+          else window.open(item.url, '_blank', 'noopener');
+        });
+
+        row.append(link, time, open);
+        historyList.appendChild(row);
+      });
+    }
+
+    historyPagination.hidden = history.length <= HISTORY_PAGE_SIZE;
+    historyPrevious.disabled = currentHistoryPage <= 0;
+    historyNext.disabled = currentHistoryPage >= pageCount - 1;
+    historyPageLabel.textContent = I18N.t('settings.historyPage', { current: currentHistoryPage + 1, total: pageCount });
+  }
+
   async function enableConnectivityChecks() {
     const concurrency = Number(connectivityConcurrency.value);
     if (!Number.isInteger(concurrency) || concurrency < 1 || concurrency > 20) {
@@ -356,6 +498,8 @@
     updatePresetOptions();
     showMessage(message, '');
     showMessage(connectivitySettingsMessage, '');
+    showMessage(historySettingsMessage, '');
+    renderHistory();
   });
 
   themeSelect.addEventListener('change', () => {
@@ -375,6 +519,22 @@
   });
 
   contentRetention.addEventListener('change', saveRetentionSettings);
+
+  historyEnabled.addEventListener('change', saveHistorySettings);
+  historyLimit.addEventListener('change', saveHistorySettings);
+  historyPrevious.addEventListener('click', () => {
+    currentHistoryPage = Math.max(0, currentHistoryPage - 1);
+    renderHistory();
+  });
+  historyNext.addEventListener('click', () => {
+    currentHistoryPage += 1;
+    renderHistory();
+  });
+
+  clearStorageBtn.addEventListener('click', async () => {
+    if (!window.confirm(I18N.t('settings.clearStorageConfirm'))) return;
+    await clearAllStoredData();
+  });
 
   document.getElementById('addLanguageRuleBtn').addEventListener('click', () => {
     const presetKey = languagePresetSelect.value;
