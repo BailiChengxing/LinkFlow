@@ -387,7 +387,7 @@
       empty.textContent = I18N.t('settings.historyEmpty');
       historyList.appendChild(empty);
     } else {
-      pageItems.forEach(item => {
+      pageItems.forEach((item, pageIndex) => {
         const row = document.createElement('div');
         row.className = 'history-row';
 
@@ -414,7 +414,23 @@
           else window.open(item.url, '_blank', 'noopener');
         });
 
-        row.append(link, time, open);
+        const remove = document.createElement('button');
+        remove.type = 'button';
+        remove.className = 'secondary-btn history-delete-btn';
+        remove.textContent = I18N.t('settings.historyDelete');
+        remove.addEventListener('click', () => {
+          const entries = getExtractionHistory();
+          entries.splice(currentHistoryPage * HISTORY_PAGE_SIZE + pageIndex, 1);
+          localStorage.setItem(HISTORY_STORAGE_KEY, JSON.stringify(entries));
+          currentHistoryPage = Math.min(currentHistoryPage, Math.max(0, Math.ceil(entries.length / HISTORY_PAGE_SIZE) - 1));
+          showMessage(historySettingsMessage, I18N.t('settings.historyDeleted'));
+          renderHistory();
+        });
+
+        const actions = document.createElement('div');
+        actions.className = 'history-actions';
+        actions.append(open, remove);
+        row.append(link, time, actions);
         historyList.appendChild(row);
       });
     }

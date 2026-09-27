@@ -89,6 +89,8 @@
     "historyTimeLabel": "提取时间",
     "historyActionLabel": "操作",
     "historyOpen": "打开",
+    "historyDelete": "删除",
+    "historyDeleted": "已删除这条历史记录。",
     "historyEmpty": "暂无历史记录。",
     "historyPrevious": "上一页",
     "historyNext": "下一页",
@@ -142,6 +144,8 @@
     "aboutRetention": "可设置弹窗输入和提取结果的保留时间：不删除、关闭浏览器后删除或每次使用后删除。",
     "aboutHistory": "可选择保存提取的链接及时间，并在“更多”页面分页查看。",
     "aboutVersion": "版本：{version}",
+    "aboutEdge": "Edge 加载项",
+    "aboutFirefox": "Firefox 附加组件",
     "aboutGithub": "GitHub 项目主页"
   }
 }

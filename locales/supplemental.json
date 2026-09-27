@@ -53,6 +53,8 @@
       "historyTimeLabel": "وقت الاستخراج",
       "historyActionLabel": "الإجراء",
       "historyOpen": "فتح",
+      "historyDelete": "حذف",
+      "historyDeleted": "تم حذف السجل.",
       "historyEmpty": "لا توجد سجلات بعد.",
       "historyPrevious": "السابق",
       "historyNext": "التالي",
@@ -83,6 +85,8 @@
       "aboutRetention": "اختر الاحتفاظ بمدخلات النافذة ونتائجها أو حذفها عند إغلاق المتصفح أو بعد كل استخدام.",
       "aboutHistory": "يمكنك تفعيل حفظ الروابط المستخرجة وأوقاتها وعرضها على صفحات في قسم المزيد.",
       "aboutVersion": "الإصدار: {version}",
+      "aboutEdge": "إضافات Microsoft Edge",
+      "aboutFirefox": "إضافات Firefox",
       "aboutGithub": "صفحة مشروع GitHub"
     }
   },
@@ -140,6 +144,8 @@
       "historyTimeLabel": "Extraktionszeit",
       "historyActionLabel": "Aktion",
       "historyOpen": "Öffnen",
+      "historyDelete": "Löschen",
+      "historyDeleted": "Verlaufseintrag gelöscht.",
       "historyEmpty": "Noch kein Verlauf vorhanden.",
       "historyPrevious": "Zurück",
       "historyNext": "Weiter",
@@ -170,6 +176,8 @@
       "aboutRetention": "Lege fest, ob Popup-Eingaben und Ergebnisse erhalten bleiben, beim Schließen des Browsers oder nach jeder Verwendung gelöscht werden.",
       "aboutHistory": "Speichere optional extrahierte Links mit Zeitstempel und rufe sie seitenweise unter „Mehr“ auf.",
       "aboutVersion": "Version: {version}",
+      "aboutEdge": "Microsoft Edge-Add-ons",
+      "aboutFirefox": "Firefox-Add-ons",
       "aboutGithub": "GitHub-Projektseite"
     }
   },
@@ -227,6 +235,8 @@
       "historyTimeLabel": "Hora de extracción",
       "historyActionLabel": "Acción",
       "historyOpen": "Abrir",
+      "historyDelete": "Eliminar",
+      "historyDeleted": "Registro eliminado del historial.",
       "historyEmpty": "Aún no hay historial.",
       "historyPrevious": "Anterior",
       "historyNext": "Siguiente",
@@ -257,6 +267,8 @@
       "aboutRetention": "Elige si conservar el texto y los resultados, eliminarlos al cerrar el navegador o después de cada uso.",
       "aboutHistory": "Guarda opcionalmente los enlaces extraídos y sus horas, y consúltalos por páginas en Más.",
       "aboutVersion": "Versión: {version}",
+      "aboutEdge": "Complementos de Microsoft Edge",
+      "aboutFirefox": "Complementos de Firefox",
       "aboutGithub": "Página del proyecto en GitHub"
     }
   },
@@ -314,6 +326,8 @@
       "historyTimeLabel": "Heure d’extraction",
       "historyActionLabel": "Action",
       "historyOpen": "Ouvrir",
+      "historyDelete": "Supprimer",
+      "historyDeleted": "Entrée supprimée de l’historique.",
       "historyEmpty": "Aucun historique pour le moment.",
       "historyPrevious": "Précédent",
       "historyNext": "Suivant",
@@ -344,6 +358,8 @@
       "aboutRetention": "Choisissez de conserver les saisies et résultats, de les supprimer à la fermeture du navigateur ou après chaque utilisation.",
       "aboutHistory": "Enregistrez les liens extraits et leur heure, puis consultez-les par pages dans Plus.",
       "aboutVersion": "Version : {version}",
+      "aboutEdge": "Modules complémentaires Microsoft Edge",
+      "aboutFirefox": "Modules complémentaires Firefox",
       "aboutGithub": "Page du projet GitHub"
     }
   },
@@ -401,6 +417,8 @@
       "historyTimeLabel": "निष्कर्षण समय",
       "historyActionLabel": "कार्रवाई",
       "historyOpen": "खोलें",
+      "historyDelete": "हटाएँ",
+      "historyDeleted": "इतिहास रिकॉर्ड हटा दिया गया।",
       "historyEmpty": "अभी कोई इतिहास नहीं है।",
       "historyPrevious": "पिछला",
       "historyNext": "अगला",
@@ -431,6 +449,8 @@
       "aboutRetention": "चुनें कि पॉपअप इनपुट और परिणाम रखें, ब्राउज़र बंद होने पर हटाएँ या हर उपयोग के बाद हटाएँ।",
       "aboutHistory": "निकाले गए लिंक और समय वैकल्पिक रूप से सहेजें और अधिक अनुभाग में पृष्ठों के अनुसार देखें।",
       "aboutVersion": "संस्करण: {version}",
+      "aboutEdge": "Microsoft Edge ऐड-ऑन",
+      "aboutFirefox": "Firefox ऐड-ऑन",
       "aboutGithub": "GitHub प्रोजेक्ट पृष्ठ"
     }
   },
@@ -488,6 +508,8 @@
       "historyTimeLabel": "Ora di estrazione",
       "historyActionLabel": "Azione",
       "historyOpen": "Apri",
+      "historyDelete": "Elimina",
+      "historyDeleted": "Voce eliminata dalla cronologia.",
       "historyEmpty": "Nessuna cronologia disponibile.",
       "historyPrevious": "Precedente",
       "historyNext": "Successiva",
@@ -518,6 +540,8 @@
       "aboutRetention": "Scegli se conservare input e risultati del popup, eliminarli alla chiusura del browser o dopo ogni utilizzo.",
       "aboutHistory": "Salva facoltativamente i link estratti con l’ora e consultali per pagine nella sezione Altro.",
       "aboutVersion": "Versione: {version}",
+      "aboutEdge": "Componenti aggiuntivi Microsoft Edge",
+      "aboutFirefox": "Componenti aggiuntivi Firefox",
       "aboutGithub": "Pagina del progetto GitHub"
     }
   },
@@ -561,6 +585,8 @@
       "historyTimeLabel": "抽出時刻",
       "historyActionLabel": "操作",
       "historyOpen": "開く",
+      "historyDelete": "削除",
+      "historyDeleted": "履歴を削除しました。",
       "historyEmpty": "履歴はありません。",
       "historyPrevious": "前へ",
       "historyNext": "次へ",
@@ -584,6 +610,8 @@
       "aboutValidity": "抽出したリンクの有効性を任意で確認し、同時実行数を設定できます。",
       "aboutRetention": "ポップアップの入力と結果を保持するか、ブラウザー終了時または使用ごとに削除するか選べます。",
       "aboutHistory": "抽出したリンクと時刻を任意で保存し、「その他」でページごとに確認できます。",
+      "aboutEdge": "Microsoft Edge アドオン",
+      "aboutFirefox": "Firefox アドオン",
       "aboutVersion": "バージョン：{version}"
     }
   },
@@ -641,6 +669,8 @@
       "historyTimeLabel": "추출 시간",
       "historyActionLabel": "작업",
       "historyOpen": "열기",
+      "historyDelete": "삭제",
+      "historyDeleted": "기록을 삭제했습니다.",
       "historyEmpty": "기록이 없습니다.",
       "historyPrevious": "이전",
       "historyNext": "다음",
@@ -671,6 +701,8 @@
       "aboutRetention": "팝업 입력과 결과를 보관하거나 브라우저 종료 시 또는 매 사용 후 삭제하도록 설정할 수 있습니다.",
       "aboutHistory": "추출한 링크와 시간을 선택적으로 저장하고 더보기에서 페이지별로 확인할 수 있습니다.",
       "aboutVersion": "버전: {version}",
+      "aboutEdge": "Microsoft Edge 추가 기능",
+      "aboutFirefox": "Firefox 부가 기능",
       "aboutGithub": "GitHub 프로젝트 페이지"
     }
   },
@@ -728,6 +760,8 @@
       "historyTimeLabel": "Extractietijd",
       "historyActionLabel": "Actie",
       "historyOpen": "Openen",
+      "historyDelete": "Verwijderen",
+      "historyDeleted": "Geschiedenisitem verwijderd.",
       "historyEmpty": "Nog geen geschiedenis.",
       "historyPrevious": "Vorige",
       "historyNext": "Volgende",
@@ -758,6 +792,8 @@
       "aboutRetention": "Kies of popupinvoer en resultaten bewaard blijven, worden verwijderd bij het sluiten van de browser of na elk gebruik.",
       "aboutHistory": "Sla links en extractietijden optioneel op en bekijk ze per pagina onder Meer.",
       "aboutVersion": "Versie: {version}",
+      "aboutEdge": "Microsoft Edge-invoegtoepassingen",
+      "aboutFirefox": "Firefox-add-ons",
       "aboutGithub": "GitHub-projectpagina"
     }
   },
@@ -815,6 +851,8 @@
       "historyTimeLabel": "Horário da extração",
       "historyActionLabel": "Ação",
       "historyOpen": "Abrir",
+      "historyDelete": "Excluir",
+      "historyDeleted": "Registro removido do histórico.",
       "historyEmpty": "Ainda não há histórico.",
       "historyPrevious": "Anterior",
       "historyNext": "Próxima",
@@ -845,6 +883,8 @@
       "aboutRetention": "Escolha manter as entradas e os resultados do pop-up, excluí-los ao fechar o navegador ou após cada uso.",
       "aboutHistory": "Salve opcionalmente links extraídos e seus horários e consulte-os por páginas em Mais.",
       "aboutVersion": "Versão: {version}",
+      "aboutEdge": "Complementos do Microsoft Edge",
+      "aboutFirefox": "Complementos do Firefox",
       "aboutGithub": "Página do projeto no GitHub"
     }
   },
@@ -902,6 +942,8 @@
       "historyTimeLabel": "Время извлечения",
       "historyActionLabel": "Действие",
       "historyOpen": "Открыть",
+      "historyDelete": "Удалить",
+      "historyDeleted": "Запись истории удалена.",
       "historyEmpty": "История пока пуста.",
       "historyPrevious": "Назад",
       "historyNext": "Далее",
@@ -932,6 +974,8 @@
       "aboutRetention": "Выберите, сохранять ли ввод и результаты, удалять их при закрытии браузера или после каждого использования.",
       "aboutHistory": "Сохраняйте ссылки и время извлечения и просматривайте их постранично в разделе «Ещё».",
       "aboutVersion": "Версия: {version}",
+      "aboutEdge": "Дополнения Microsoft Edge",
+      "aboutFirefox": "Дополнения Firefox",
       "aboutGithub": "Страница проекта на GitHub"
     }
   },
@@ -989,6 +1033,8 @@
       "historyTimeLabel": "Çıkarma zamanı",
       "historyActionLabel": "İşlem",
       "historyOpen": "Aç",
+      "historyDelete": "Sil",
+      "historyDeleted": "Geçmiş kaydı silindi.",
       "historyEmpty": "Henüz geçmiş yok.",
       "historyPrevious": "Önceki",
       "historyNext": "Sonraki",
@@ -1019,6 +1065,8 @@
       "aboutRetention": "Açılır pencere girdilerini ve sonuçlarını saklamayı, tarayıcı kapanınca veya her kullanımdan sonra silmeyi seçin.",
       "aboutHistory": "Çıkarılan bağlantıları ve zamanlarını isteğe bağlı kaydedip Daha fazla bölümünde sayfalar halinde görüntüleyin.",
       "aboutVersion": "Sürüm: {version}",
+      "aboutEdge": "Microsoft Edge eklentileri",
+      "aboutFirefox": "Firefox eklentileri",
       "aboutGithub": "GitHub proje sayfası"
     }
   },
@@ -1076,6 +1124,8 @@
       "historyTimeLabel": "擷取時間",
       "historyActionLabel": "操作",
       "historyOpen": "開啟",
+      "historyDelete": "刪除",
+      "historyDeleted": "已刪除此筆歷史紀錄。",
       "historyEmpty": "目前沒有歷史紀錄。",
       "historyPrevious": "上一頁",
       "historyNext": "下一頁",
@@ -1106,6 +1156,8 @@
       "aboutRetention": "可設定彈出視窗輸入與結果的保留方式：不刪除、關閉瀏覽器後刪除或每次使用後刪除。",
       "aboutHistory": "可選擇儲存擷取的連結及時間，並在「更多」頁面分頁檢視。",
       "aboutVersion": "版本：{version}",
+      "aboutEdge": "Edge 擴充功能",
+      "aboutFirefox": "Firefox 附加元件",
       "aboutGithub": "GitHub 專案頁面"
     }
   }

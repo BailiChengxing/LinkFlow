@@ -89,6 +89,8 @@
     "historyTimeLabel": "Extraction time",
     "historyActionLabel": "Action",
     "historyOpen": "Open",
+    "historyDelete": "Delete",
+    "historyDeleted": "History entry deleted.",
     "historyEmpty": "No history yet.",
     "historyPrevious": "Previous",
     "historyNext": "Next",
@@ -142,6 +144,8 @@
     "aboutRetention": "Choose whether popup input and results are kept, deleted when the browser closes, or deleted after each use.",
     "aboutHistory": "Optionally save extracted links and their timestamps, then browse them in pages in More.",
     "aboutVersion": "Version: {version}",
+    "aboutEdge": "Microsoft Edge Add-ons",
+    "aboutFirefox": "Firefox Add-ons",
     "aboutGithub": "GitHub project page"
   }
 }

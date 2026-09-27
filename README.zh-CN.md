@@ -25,12 +25,16 @@
 
 ### Chrome、Edge 或 Brave
 
+可从 [Microsoft Edge 加载项商店](https://microsoftedge.microsoft.com/addons/detail/gbfnjfjmjijdngcikfldgmkamhcjcmnm)安装已发布的版本，也可按以下步骤加载未打包版本。
+
 1. 下载或克隆本仓库。
 2. 打开 `chrome://extensions/`（或浏览器的扩展程序页面）。
 3. 开启**开发者模式**。
 4. 点击**加载已解压的扩展程序**，选择仓库目录。
 
 ### Firefox 桌面版
+
+可从 [Firefox 附加组件商店](https://addons.mozilla.org/zh-CN/firefox/addon/%E6%B8%85%E9%93%BE%E5%8A%A9%E6%89%8B/)安装已发布的版本，也可按以下步骤临时载入。
 
 1. 打开 `about:debugging#/runtime/this-firefox`。
 2. 点击**临时载入附加组件…**。

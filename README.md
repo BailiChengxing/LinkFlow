@@ -25,12 +25,16 @@
 
 ### Chrome, Edge, or Brave
 
+Install the published extension from [Microsoft Edge Add-ons](https://microsoftedge.microsoft.com/addons/detail/gbfnjfjmjijdngcikfldgmkamhcjcmnm), or load it unpacked using the steps below.
+
 1. Download or clone this repository.
 2. Open `chrome://extensions/` (or the browser's extensions page).
 3. Enable **Developer mode**.
 4. Select **Load unpacked** and choose the repository directory.
 
 ### Firefox desktop
+
+Install the published extension from [Firefox Add-ons](https://addons.mozilla.org/zh-CN/firefox/addon/%E6%B8%85%E9%93%BE%E5%8A%A9%E6%89%8B/), or load it temporarily using the steps below.
 
 1. Open `about:debugging#/runtime/this-firefox`.
 2. Choose **Load Temporary Add-on…**.
