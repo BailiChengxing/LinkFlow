@@ -47,6 +47,12 @@ For Firefox Android, install the published add-on from [Firefox Add-ons](https:/
 
 Connectivity checks are off by default. Open **Settings → Test**, enable the feature, and choose a concurrency value. Enabling it prompts for optional access to all HTTP/HTTPS websites; this permission is used to send requests to the extracted URLs so the browser can report whether an HTTP response was received. Checks run only after extraction and only when the feature is enabled. A timeout or blocked request is reported as unreachable; server responses include their HTTP status. A website can be reachable while a particular page returns an error status.
 
+### Link validity test
+
+The **Link validity test** is a quick per-link check that helps you tell whether an extracted URL is actually usable. After extraction, each URL can be tested individually. When enabled, the popup marks each result with a status such as **Valid** or **No response** so you can quickly spot dead, blocked, or invalid links before opening them.
+
+This test is optional and disabled by default. When you enable it, LinkFlow requests the browser's optional site access permission for HTTP/HTTPS pages and sends lightweight requests to the extracted links. The testing process is limited by the configured concurrency value to avoid too many simultaneous requests, and the badge shown next to each result makes the outcome easy to scan at a glance.
+
 ### Cleanup rules
 
 In **Settings → General**, configure Unicode ranges and bracket/quote pairs. The built-in character cleanup starts with Chinese characters enabled. Add, edit, or remove ranges as needed. Bracket cleanup is individually selectable and removes a matched pair together with the content inside it.
