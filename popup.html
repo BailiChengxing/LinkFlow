@@ -3,9 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>清链助手</title>
+  <title data-i18n="popup.title">清链助手</title>
   <style>
-    /* 基础重置 & 固定桌面端 Popup 尺寸 */
     *, *::before, *::after {
       box-sizing: border-box;
     }
@@ -25,8 +24,16 @@
       width: 100%;
     }
 
+    .top-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+
     h3 {
-      margin: 0 0 10px 0;
+      margin: 0;
       font-size: 15px;
       font-weight: 600;
       display: flex;
@@ -35,7 +42,23 @@
       color: #1a73e8;
     }
 
-    /* SVG 矢量图标 */
+    .settings-btn {
+      flex-shrink: 0;
+      border: 1px solid #dadce0;
+      border-radius: 6px;
+      padding: 5px 8px;
+      background: #ffffff;
+      color: #5f6368;
+      font-size: 11px;
+      cursor: pointer;
+    }
+
+    .settings-btn:hover {
+      color: #1a73e8;
+      border-color: #a8c7fa;
+      background: #f8faff;
+    }
+
     .title-icon {
       width: 22px;
       height: 22px;
@@ -148,7 +171,6 @@
       padding-right: 2px;
     }
 
-    /* 自定义滚动条，保持精致视觉 */
     .links-container::-webkit-scrollbar {
       width: 5px;
     }
@@ -213,7 +235,6 @@
       font-size: 12px;
     }
 
-    /* 仅在真机移动端（Firefox Android）环境生效的样式适配 */
     @media (pointer: coarse) {
         html, body {
           width: 100vw;
@@ -227,47 +248,51 @@
 </head>
 <body>
   <div class="app-card">
-    <h3>
-      <svg class="title-icon" viewBox="0 0 128 128">
-        <defs>
-          <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stop-color="#2575FC" />
-            <stop offset="100%" stop-color="#6A11CB" />
-          </linearGradient>
-          <linearGradient id="linkGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stop-color="#FFFFFF" />
-            <stop offset="100%" stop-color="#E0E7FF" />
-          </linearGradient>
-        </defs>
-        <rect x="8" y="8" width="112" height="112" rx="28" fill="url(#bgGrad)" />
-        <g transform="translate(24, 24) scale(0.625)" fill="none" stroke="url(#linkGrad)" stroke-width="12" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M 52,76 L 40,76 A 24,24 0 0,1 40,28 L 52,28" />
-          <path d="M 76,28 L 88,28 A 24,24 0 0,1 88,76 L 76,76" />
-          <line x1="44" y1="52" x2="84" y2="52" />
-        </g>
-        <path d="M 96 70 L 98.5 81.5 L 110 84 L 98.5 86.5 L 96 98 L 93.5 86.5 L 82 84 L 93.5 81.5 Z" fill="#FFD700" />
-      </svg>
-      清链助手
-    </h3>
-
-    <div class="input-group">
-      <textarea id="rawInput" placeholder="在此粘贴包含多个链接的文本..."></textarea>
-      <button id="pasteBtn" class="paste-btn" title="读取剪切板">📋 读取剪切板</button>
+    <div class="top-bar">
+      <h3>
+        <svg class="title-icon" viewBox="0 0 128 128">
+          <defs>
+            <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#2575FC" />
+              <stop offset="100%" stop-color="#6A11CB" />
+            </linearGradient>
+            <linearGradient id="linkGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#FFFFFF" />
+              <stop offset="100%" stop-color="#E0E7FF" />
+            </linearGradient>
+          </defs>
+          <rect x="8" y="8" width="112" height="112" rx="28" fill="url(#bgGrad)" />
+          <g transform="translate(24, 24) scale(0.625)" fill="none" stroke="url(#linkGrad)" stroke-width="12" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M 52,76 L 40,76 A 24,24 0 0,1 40,28 L 52,28" />
+            <path d="M 76,28 L 88,28 A 24,24 0 0,1 88,76 L 76,76" />
+            <line x1="44" y1="52" x2="84" y2="52" />
+          </g>
+          <path d="M 96 70 L 98.5 81.5 L 110 84 L 98.5 86.5 L 96 98 L 93.5 86.5 L 82 84 L 93.5 81.5 Z" fill="#FFD700" />
+        </svg>
+        <span data-i18n="popup.title">清链助手</span>
+      </h3>
+      <button id="settingsBtn" class="settings-btn" type="button" data-i18n-title="popup.settingsBtnTitle" data-i18n="popup.settingsBtn">⚙ 设置</button>
     </div>
 
-    <button id="extractBtn" class="action-btn">提取全部链接</button>
+    <div class="input-group">
+      <textarea id="rawInput" data-i18n-placeholder="popup.textareaPlaceholder" placeholder="在此粘贴包含多个链接的文本..."></textarea>
+      <button id="pasteBtn" class="paste-btn" type="button" data-i18n-title="popup.pasteBtnTitle" data-i18n="popup.pasteBtn">📋 读取剪贴板</button>
+    </div>
+
+    <button id="extractBtn" class="action-btn" data-i18n="popup.extractBtn">提取全部链接</button>
 
     <div class="result-section">
       <div class="result-title">
-        <span id="resultCount">提取结果：</span>
+        <span id="resultCount" data-i18n="popup.resultPrefix">提取结果：</span>
         <span id="status" class="status"></span>
       </div>
       <div id="linksContainer" class="links-container">
-        <div style="font-size: 12px; color: #70757a;">等待提取...</div>
+        <div style="font-size: 12px; color: #70757a;" data-i18n="popup.emptyWaiting">等待提取...</div>
       </div>
     </div>
   </div>
 
+  <script src="i18n.js"></script>
   <script src="popup.js"></script>
 </body>
 </html>

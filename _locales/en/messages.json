@@ -1,0 +1,4 @@
+{
+  "extName": { "message": "LinkFlow", "description": "Extension name" },
+  "extDesc": { "message": "Batch extract and clean URLs from text. Simple, efficient, ad-free.", "description": "Extension description" }
+}

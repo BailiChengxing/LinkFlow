@@ -1,0 +1,4 @@
+{
+  "extName": { "message": "リンククリーナー", "description": "Extension name" },
+  "extDesc": { "message": "テキストからURLを一括抽出・クリーニング。シンプル・高效・広告なし。", "description": "Extension description" }
+}

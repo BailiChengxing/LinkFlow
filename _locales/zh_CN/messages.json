@@ -1,0 +1,4 @@
+{
+  "extName": { "message": "清链助手", "description": "Extension name" },
+  "extDesc": { "message": "批量提取与清洗文本中的 URL，极简、高效、无广告。", "description": "Extension description" }
+}

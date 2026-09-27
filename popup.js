@@ -1,19 +1,31 @@
-document.addEventListener('DOMContentLoaded', () => {
+﻿document.addEventListener('DOMContentLoaded', async () => {
+  // Initialize i18n
+  await I18N.init();
+
   const rawInput = document.getElementById('rawInput');
   const pasteBtn = document.getElementById('pasteBtn');
   const extractBtn = document.getElementById('extractBtn');
+  const settingsBtn = document.getElementById('settingsBtn');
   const linksContainer = document.getElementById('linksContainer');
   const resultCount = document.getElementById('resultCount');
   const status = document.getElementById('status');
 
-  // 读取剪切板
+  settingsBtn.addEventListener('click', () => {
+    if (typeof chrome !== 'undefined' && chrome.runtime && chrome.runtime.openOptionsPage) {
+      chrome.runtime.openOptionsPage();
+    } else {
+      window.open('settings.html', '_blank');
+    }
+  });
+
+  // 读取剪贴板
   pasteBtn.addEventListener('click', async () => {
     try {
       const text = await navigator.clipboard.readText();
       rawInput.value = text;
-      showStatus('已读取剪切板');
+      showStatus(I18N.t('popup.statusPasteOk'));
     } catch (err) {
-      showStatus('读取失败，请手动粘贴');
+      showStatus(I18N.t('popup.statusPasteFail'));
     }
   });
 
@@ -25,41 +37,29 @@ document.addEventListener('DOMContentLoaded', () => {
     linksContainer.textContent = '';
 
     if (!rawText) {
-      renderEmpty('请输入或粘贴需要提取的文本');
+      renderEmpty(I18N.t('popup.emptyNoInput'));
       return;
     }
 
     const extractedSet = new Set();
-    const lines = rawText.split(/[\r\n\s]+/);
+    const sanitizedText = removeInsertedNoise(rawText);
+    const urlRegex = getUrlRegex();
+    const matches = sanitizedText.match(urlRegex) || [];
 
-    lines.forEach(line => {
-      if (!line.trim()) return;
-
-      // 1. 先整体移除字符串中的所有中文字符（解决插入“删”、“中”、“文”防封混淆）
-      const sanitizedLine = line.replace(/[\u4e00-\u9fa5]+/g, '');
-
-      // 2. 使用正则匹配完整的 URL 结构（支持带/不带 http，以及完整路径参数）
-      const urlRegex = /(?:https?:\/\/)?(?:[a-zA-Z0-9-]+\.)+[a-zA-Z]{2,}(?::\d+)?(?:\/[^\s<>"'{}|\\^`\[\]]*)?/gi;
-      const matches = sanitizedLine.match(urlRegex);
-
-      if (matches) {
-        matches.forEach(url => {
-          const cleaned = cleanUrl(url);
-          if (cleaned) extractedSet.add(cleaned);
-        });
-      }
+    matches.forEach(url => {
+      const cleaned = cleanUrl(url);
+      if (cleaned) extractedSet.add(cleaned);
     });
 
     const cleanedLinks = Array.from(extractedSet).filter(Boolean);
 
     if (cleanedLinks.length === 0) {
-      renderEmpty('未检测到有效 URL 链接');
+      renderEmpty(I18N.t('popup.emptyNoResult'));
       return;
     }
 
-    resultCount.textContent = `提取结果（${cleanedLinks.length} 条）：`;
+    resultCount.textContent = I18N.t('popup.resultCount', { count: cleanedLinks.length });
 
-    // 纯 DOM 节点构建渲染（不使用 innerHTML，安全合规）
     cleanedLinks.forEach(url => {
       const card = document.createElement('div');
       card.className = 'link-card';
@@ -73,7 +73,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
       const openBtn = document.createElement('button');
       openBtn.className = 'icon-btn';
-      openBtn.textContent = '打开';
+      openBtn.textContent = I18N.t('popup.openBtn');
       openBtn.onclick = () => {
         if (typeof chrome !== 'undefined' && chrome.tabs && chrome.tabs.create) {
           chrome.tabs.create({ url });
@@ -84,10 +84,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
       const copyBtn = document.createElement('button');
       copyBtn.className = 'icon-btn';
-      copyBtn.textContent = '复制';
+      copyBtn.textContent = I18N.t('popup.copyBtn');
       copyBtn.onclick = () => {
         navigator.clipboard.writeText(url);
-        showStatus('已复制');
+        showStatus(I18N.t('popup.statusCopied'));
       };
 
       btnGroup.appendChild(openBtn);
@@ -99,27 +99,77 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
-  // 格式化 URL 与补充 http/https 前缀
+  function getUrlRegex() {
+    const defaultRegex = /(?:https?:\/\/)?(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z]{2,}(?::\d{1,5})?(?:[/?#][^\s<>"'{}|\\^`\[\]]*)?/gi;
+
+    try {
+      const saved = JSON.parse(localStorage.getItem('linkflow.regexSettings') || 'null');
+      if (!saved || typeof saved.pattern !== 'string' || typeof saved.flags !== 'string') {
+        return new RegExp(defaultRegex.source, defaultRegex.flags);
+      }
+
+      const flags = Array.from(new Set(`${saved.flags}g`)).join('');
+      return new RegExp(saved.pattern, flags);
+    } catch {
+      return new RegExp(defaultRegex.source, defaultRegex.flags);
+    }
+  }
+
+  function removeInsertedNoise(text) {
+    let cleaned = text
+      .replace(/[\u200B-\u200D\u2060\uFEFF\u00AD]/g, '')
+      .replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F-\u009F]/g, '');
+
+    let rules;
+    try {
+      rules = JSON.parse(localStorage.getItem('linkflow.noiseRules') || 'null');
+    } catch {
+      rules = null;
+    }
+
+    if (!Array.isArray(rules)) {
+      rules = [{ range: '\\u3400-\\u4dbf\\u4e00-\\u9fff\\uf900-\\ufaff\\u{20000}-\\u{2fa1f}' }];
+    }
+
+    rules.forEach(rule => {
+      if (!rule || typeof rule.range !== 'string' || !rule.range) return;
+      if (rule.range.length > 512 || /[\[\]/^\r\n]/.test(rule.range)) return;
+      if (/\\(?!u(?:\{[0-9a-f]{1,6}\}|[0-9a-f]{4})|x[0-9a-f]{2})/i.test(rule.range)) return;
+      try {
+        cleaned = cleaned.replace(new RegExp(`[${rule.range}]+`, 'gu'), '');
+      } catch {
+        // Ignore invalid character ranges instead of interrupting link extraction.
+      }
+    });
+
+    return cleaned;
+  }
+
   function cleanUrl(url) {
-    let cleaned = url.replace(/[，。；！,;!]+$/, '').trim();
-    // 过滤掉只有点或不完整的非法结构
+    let cleaned = url.replace(/[.,;!?，。；！？、]+$/u, '').trim();
     if (!cleaned.includes('.')) return '';
     if (!/^https?:\/\//i.test(cleaned)) {
       cleaned = 'https://' + cleaned;
     }
+
+    try {
+      const parsed = new URL(cleaned);
+      if (parsed.protocol !== 'http:' && parsed.protocol !== 'https:') return '';
+    } catch {
+      return '';
+    }
+
     return cleaned;
   }
 
-  // 渲染空状态说明
   function renderEmpty(message) {
-    resultCount.textContent = '提取结果：';
+    resultCount.textContent = I18N.t('popup.resultPrefix');
     const emptyBox = document.createElement('div');
     emptyBox.className = 'empty-box';
     emptyBox.textContent = message;
     linksContainer.appendChild(emptyBox);
   }
 
-  // 状态提示显示
   function showStatus(msg) {
     status.textContent = msg;
     status.style.display = 'inline';
