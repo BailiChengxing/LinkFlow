@@ -14,6 +14,7 @@
 - **Custom matching:** Edit the JavaScript regular expression and flags, or restore the built-in default.
 - **Text cleanup:** Remove configured Unicode character ranges and optionally strip the contents of selected brackets, angle brackets, braces, book-title marks, and quote pairs before matching.
 - **Connectivity checks:** Optionally check extracted links and show their connection status. Configure the maximum number of concurrent checks. When enabled, the extension requests optional access to all HTTP/HTTPS websites.
+- **Popup content retention:** Keep the original input and extracted links between popup openings, delete them when the browser closes, or clear them after each use.
 - **Clipboard input:** Read clipboard text directly from the popup.
 - **Themes and localization:** 15 interface languages, plus light, dark, and browser-following themes.
 - **Private by design:** Matching and cleanup run locally. Connectivity checks contact the URLs you choose to test; input text and extracted links are not uploaded to a LinkFlow server.
@@ -45,7 +46,9 @@ For Firefox Android, install the published add-on from [Firefox Add-ons](https:/
 
 ### Connectivity checks and permissions
 
-Connectivity checks are off by default. Open **Settings → Test**, enable the feature, and choose a concurrency value. Enabling it prompts for optional access to all HTTP/HTTPS websites; this permission is used to send requests to the extracted URLs so the browser can report whether an HTTP response was received. Checks run only after extraction and only when the feature is enabled. A timeout or blocked request is reported as unreachable; server responses include their HTTP status. A website can be reachable while a particular page returns an error status.
+Connectivity checks are off by default. Open **Settings → More → Link validity test**, enable the feature, and choose a concurrency value. Enabling it prompts for optional access to all HTTP/HTTPS websites; this permission is used to send requests to the extracted URLs so the browser can report whether an HTTP response was received. Checks run only after extraction and only when the feature is enabled. A timeout or blocked request is reported as unreachable; server responses include their HTTP status. A website can be reachable while a particular page returns an error status.
+
+In **Settings → More → Retention period**, choose whether the popup keeps its original input and extracted links indefinitely, deletes them when the browser closes, or deletes them after each use. The default is to delete them when the browser closes.
 
 ### Link validity test
 

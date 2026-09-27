@@ -10,6 +10,36 @@
   const linksContainer = document.getElementById('linksContainer');
   const resultCount = document.getElementById('resultCount');
   const status = document.getElementById('status');
+  const POPUP_STATE_KEY = 'linkflow.popupState';
+  const SESSION_MARKER_KEY = 'linkflow.popupSessionStarted';
+  const popupState = { input: '', links: [], emptyMessageKey: 'popup.emptyWaiting' };
+
+  await preparePopupState();
+  rawInput.value = popupState.input;
+  if (popupState.links.length > 0) {
+    const connectivitySettings = getConnectivitySettings();
+    if (connectivitySettings.enabled) {
+      popupState.links.forEach(link => {
+        link.statusKey = 'connectivityChecking';
+        link.state = 'checking';
+        delete link.status;
+      });
+      savePopupState();
+    }
+    const connectivityBadges = renderLinks(popupState.links, connectivitySettings.enabled);
+    if (connectivitySettings.enabled) runConnectivityTests(connectivityBadges, connectivitySettings.concurrency);
+  } else if (popupState.emptyMessageKey !== 'popup.emptyWaiting') {
+    renderEmpty(I18N.t(popupState.emptyMessageKey));
+  }
+
+  rawInput.addEventListener('input', () => {
+    popupState.input = rawInput.value;
+    savePopupState();
+  });
+
+  window.addEventListener('pagehide', () => {
+    if (getContentRetention() === 'after-use') localStorage.removeItem(POPUP_STATE_KEY);
+  });
 
   settingsBtn.addEventListener('click', () => {
     if (typeof chrome !== 'undefined' && chrome.runtime && chrome.runtime.openOptionsPage) {
@@ -24,6 +54,8 @@
     try {
       const text = await navigator.clipboard.readText();
       rawInput.value = text;
+      popupState.input = text;
+      savePopupState();
       showStatus(I18N.t('popup.statusPasteOk'));
     } catch (err) {
       showStatus(I18N.t('popup.statusPasteFail'));
@@ -33,11 +65,13 @@
   // 提取链接主逻辑
   extractBtn.addEventListener('click', () => {
     const rawText = rawInput.value.trim();
-    
-    // 清空展示区域
-    linksContainer.textContent = '';
+    popupState.input = rawInput.value;
 
     if (!rawText) {
+      popupState.links = [];
+      popupState.emptyMessageKey = 'popup.emptyNoInput';
+      savePopupState();
+      linksContainer.textContent = '';
       renderEmpty(I18N.t('popup.emptyNoInput'));
       return;
     }
@@ -55,15 +89,35 @@
     const cleanedLinks = Array.from(extractedSet).filter(Boolean);
 
     if (cleanedLinks.length === 0) {
+      popupState.links = [];
+      popupState.emptyMessageKey = 'popup.emptyNoResult';
+      savePopupState();
+      linksContainer.textContent = '';
       renderEmpty(I18N.t('popup.emptyNoResult'));
       return;
     }
 
-    resultCount.textContent = I18N.t('popup.resultCount', { count: cleanedLinks.length });
-
     const connectivitySettings = getConnectivitySettings();
+    popupState.links = cleanedLinks.map(url => ({
+      url,
+      statusKey: connectivitySettings.enabled ? 'connectivityChecking' : null,
+      state: connectivitySettings.enabled ? 'checking' : null
+    }));
+    popupState.emptyMessageKey = null;
+    savePopupState();
+    linksContainer.textContent = '';
+    const connectivityBadges = renderLinks(popupState.links, connectivitySettings.enabled);
+    if (connectivitySettings.enabled) {
+      runConnectivityTests(connectivityBadges, connectivitySettings.concurrency);
+    }
+  });
+
+  function renderLinks(links, connectivityEnabled) {
+    linksContainer.textContent = '';
+    resultCount.textContent = I18N.t('popup.resultCount', { count: links.length });
     const connectivityBadges = [];
-    cleanedLinks.forEach(url => {
+    links.forEach(link => {
+      const url = link.url;
       const card = document.createElement('div');
       card.className = 'link-card';
 
@@ -73,9 +127,10 @@
 
       const connectivityBadge = document.createElement('span');
       connectivityBadge.className = 'connectivity-status';
-      if (connectivitySettings.enabled) {
-        connectivityBadge.textContent = I18N.t('popup.connectivityChecking');
-        connectivityBadges.push({ url, element: connectivityBadge });
+      if (connectivityEnabled) {
+        connectivityBadge.textContent = I18N.t(`popup.${link.statusKey || 'connectivityChecking'}`, { status: link.status });
+        if (link.state) connectivityBadge.dataset.state = link.state;
+        connectivityBadges.push({ url, element: connectivityBadge, record: link });
       }
 
       const btnGroup = document.createElement('div');
@@ -103,16 +158,95 @@
       btnGroup.appendChild(openBtn);
       btnGroup.appendChild(copyBtn);
       card.appendChild(linkText);
-      if (connectivitySettings.enabled) card.appendChild(connectivityBadge);
+      if (connectivityEnabled) card.appendChild(connectivityBadge);
       card.appendChild(btnGroup);
 
       linksContainer.appendChild(card);
     });
+    return connectivityBadges;
+  }
 
-    if (connectivitySettings.enabled) {
-      runConnectivityTests(connectivityBadges, connectivitySettings.concurrency);
+  async function preparePopupState() {
+    const hasSession = await getSessionMarker();
+    if (hasSession === false) {
+      if (getContentRetention() !== 'never') localStorage.removeItem(POPUP_STATE_KEY);
+      await setSessionMarker();
     }
-  });
+
+    try {
+      const saved = JSON.parse(localStorage.getItem(POPUP_STATE_KEY) || 'null');
+      if (!saved || typeof saved !== 'object') return;
+      popupState.input = typeof saved.input === 'string' ? saved.input : '';
+      popupState.links = Array.isArray(saved.links)
+        ? saved.links.filter(link => link && typeof link.url === 'string').map(link => ({
+          url: link.url,
+          statusKey: typeof link.statusKey === 'string' ? link.statusKey : null,
+          state: typeof link.state === 'string' ? link.state : null,
+          ...(Number.isInteger(link.status) ? { status: link.status } : {})
+        }))
+        : [];
+      popupState.emptyMessageKey = typeof saved.emptyMessageKey === 'string'
+        ? saved.emptyMessageKey
+        : (popupState.links.length ? null : 'popup.emptyWaiting');
+    } catch {
+      localStorage.removeItem(POPUP_STATE_KEY);
+    }
+  }
+
+  function getContentRetention() {
+    const setting = localStorage.getItem('linkflow.contentRetention');
+    return ['never', 'browser', 'after-use'].includes(setting) ? setting : 'browser';
+  }
+
+  function savePopupState() {
+    try {
+      localStorage.setItem(POPUP_STATE_KEY, JSON.stringify(popupState));
+    } catch {
+      // Keep the popup usable when browser storage is unavailable or full.
+    }
+  }
+
+  async function getSessionMarker() {
+    const browserArea = globalThis.browser?.storage?.session;
+    if (browserArea) {
+      try {
+        const stored = await browserArea.get(SESSION_MARKER_KEY);
+        return stored[SESSION_MARKER_KEY] === true;
+      } catch {
+        return null;
+      }
+    }
+    const chromeArea = globalThis.chrome?.storage?.session;
+    if (!chromeArea) return null;
+    return new Promise(resolve => {
+      try {
+        chromeArea.get(SESSION_MARKER_KEY, result => resolve(result?.[SESSION_MARKER_KEY] === true));
+      } catch {
+        resolve(null);
+      }
+    });
+  }
+
+  async function setSessionMarker() {
+    const browserArea = globalThis.browser?.storage?.session;
+    if (browserArea) {
+      try {
+        await browserArea.set({ [SESSION_MARKER_KEY]: true });
+      } catch {
+        // Session storage is optional on older browsers.
+      }
+      return;
+    }
+    const chromeArea = globalThis.chrome?.storage?.session;
+    if (!chromeArea) return;
+    await new Promise(resolve => {
+      try {
+        chromeArea.set({ [SESSION_MARKER_KEY]: true }, resolve);
+      } catch {
+        resolve();
+      }
+    });
+  }
 
   function getConnectivitySettings() {
     try {
@@ -131,18 +265,18 @@
   async function runConnectivityTests(items, concurrency) {
     const permissions = globalThis.browser?.permissions || globalThis.chrome?.permissions;
     if (!permissions?.contains) {
-      items.forEach(({ element }) => setConnectivityBadge(element, 'connectivityPermissionMissing', 'error'));
+      items.forEach(({ element, record }) => setConnectivityBadge(element, 'connectivityPermissionMissing', 'error', undefined, record));
       return;
     }
 
     try {
       const hasPermission = await permissions.contains({ origins: ['http://*/*', 'https://*/*'] });
       if (!hasPermission) {
-        items.forEach(({ element }) => setConnectivityBadge(element, 'connectivityPermissionMissing', 'error'));
+        items.forEach(({ element, record }) => setConnectivityBadge(element, 'connectivityPermissionMissing', 'error', undefined, record));
         return;
       }
     } catch {
-      items.forEach(({ element }) => setConnectivityBadge(element, 'connectivityPermissionMissing', 'error'));
+      items.forEach(({ element, record }) => setConnectivityBadge(element, 'connectivityPermissionMissing', 'error', undefined, record));
       return;
     }
 
@@ -151,7 +285,7 @@
       while (nextIndex < items.length) {
         const item = items[nextIndex];
         nextIndex += 1;
-        await checkConnectivity(item.url, item.element);
+        await checkConnectivity(item.url, item.element, item.record);
       }
     }
 
@@ -159,7 +293,7 @@
     await Promise.all(Array.from({ length: workerCount }, () => worker()));
   }
 
-  async function checkConnectivity(url, badge) {
+  async function checkConnectivity(url, badge, record) {
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), 8000);
     try {
@@ -170,18 +304,25 @@
         redirect: 'follow',
         signal: controller.signal
       });
-      setConnectivityBadge(badge, 'connectivityReachable', 'reachable', { status: response.status });
+      setConnectivityBadge(badge, 'connectivityReachable', 'reachable', { status: response.status }, record);
     } catch {
-      setConnectivityBadge(badge, controller.signal.aborted ? 'connectivityTimedOut' : 'connectivityUnreachable', 'error');
+      setConnectivityBadge(badge, controller.signal.aborted ? 'connectivityTimedOut' : 'connectivityUnreachable', 'error', undefined, record);
     } finally {
       clearTimeout(timeout);
     }
   }
 
-  function setConnectivityBadge(element, translationKey, state, params) {
+  function setConnectivityBadge(element, translationKey, state, params, record) {
     element.textContent = I18N.t(`popup.${translationKey}`, params);
     element.dataset.state = state;
     element.setAttribute('role', 'status');
+    if (record) {
+      record.statusKey = translationKey;
+      record.state = state;
+      if (Number.isInteger(params?.status)) record.status = params.status;
+      else delete record.status;
+      savePopupState();
+    }
   }
 
   function getUrlRegex() {

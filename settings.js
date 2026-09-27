@@ -3,6 +3,7 @@
   const NOISE_STORAGE_KEY = 'linkflow.noiseRules';
   const BRACKET_STORAGE_KEY = 'linkflow.bracketCleanup';
   const CONNECTIVITY_STORAGE_KEY = 'linkflow.connectivityTest';
+  const RETENTION_STORAGE_KEY = 'linkflow.contentRetention';
   const DEFAULT_PATTERN = "(?:https?:\\/\\/)?(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\\.)+[a-z]{2,}(?::\\d{1,5})?(?:[/?#][^\\s<>\"'{}|\\\\^`\\[\\]]*)?";
   const DEFAULT_FLAGS = 'gi';
   const PRESETS = {
@@ -28,6 +29,8 @@
   const connectivityEnabled = document.getElementById('connectivityEnabled');
   const connectivityConcurrency = document.getElementById('connectivityConcurrency');
   const connectivitySettingsMessage = document.getElementById('connectivitySettingsMessage');
+  const contentRetention = document.getElementById('contentRetention');
+  const retentionSettingsMessage = document.getElementById('retentionSettingsMessage');
   const languagePresetSelect = document.getElementById('languagePresetSelect');
   const languageRulesList = document.getElementById('languageRulesList');
 
@@ -56,6 +59,7 @@
     loadNoiseRules();
     loadBracketOptions();
     loadConnectivitySettings();
+    loadRetentionSettings();
     updatePresetOptions();
   }
 
@@ -268,6 +272,17 @@
     return true;
   }
 
+  function loadRetentionSettings() {
+    const allowedValues = ['never', 'browser', 'after-use'];
+    const saved = localStorage.getItem(RETENTION_STORAGE_KEY);
+    contentRetention.value = allowedValues.includes(saved) ? saved : 'browser';
+  }
+
+  function saveRetentionSettings() {
+    localStorage.setItem(RETENTION_STORAGE_KEY, contentRetention.value);
+    showMessage(retentionSettingsMessage, I18N.t('settings.retentionSaved'));
+  }
+
   async function enableConnectivityChecks() {
     const concurrency = Number(connectivityConcurrency.value);
     if (!Number.isInteger(concurrency) || concurrency < 1 || concurrency > 20) {
@@ -358,6 +373,8 @@
   connectivityConcurrency.addEventListener('change', () => {
     saveConnectivitySettings();
   });
+
+  contentRetention.addEventListener('change', saveRetentionSettings);
 
   document.getElementById('addLanguageRuleBtn').addEventListener('click', () => {
     const presetKey = languagePresetSelect.value;
