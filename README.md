@@ -15,6 +15,7 @@
 - **Text cleanup:** Remove configured Unicode character ranges and optionally strip the contents of selected brackets, angle brackets, braces, book-title marks, and quote pairs before matching.
 - **Connectivity checks:** Optionally check extracted links and show their connection status. Configure the maximum number of concurrent checks. When enabled, the extension requests optional access to all HTTP/HTTPS websites.
 - **Popup content retention:** Keep the original input and extracted links between popup openings, delete them when the browser closes, or clear them after each use.
+- **Right-click extraction:** Optionally enable a selection context-menu command to open LinkFlow and extract links from selected text immediately.
 - **Clipboard input:** Read clipboard text directly from the popup.
 - **Themes and localization:** 15 interface languages, plus light, dark, and browser-following themes.
 - **Private by design:** Matching and cleanup run locally. Connectivity checks contact the URLs you choose to test; input text and extracted links are not uploaded to a LinkFlow server.
@@ -36,9 +37,11 @@ Install the published extension from [Microsoft Edge Add-ons](https://microsofte
 
 Install the published extension from [Firefox Add-ons](https://addons.mozilla.org/zh-CN/firefox/addon/%E6%B8%85%E9%93%BE%E5%8A%A9%E6%89%8B/), or load it temporarily using the steps below.
 
+Firefox uses its own Manifest V3 background-script format. With Node.js installed, run `node build-firefox.mjs` from the repository directory, then load `.build/firefox/manifest.json` as the temporary add-on.
+
 1. Open `about:debugging#/runtime/this-firefox`.
 2. Choose **Load Temporary Add-on…**.
-3. Select the repository's `manifest.json` file.
+3. Select `.build/firefox/manifest.json`.
 
 For Firefox Android, install the published add-on from [Firefox Add-ons](https://addons.mozilla.org/) when available for your device.
 
@@ -47,6 +50,8 @@ For Firefox Android, install the published add-on from [Firefox Add-ons](https:/
 1. Open LinkFlow and paste text or use **Read Clipboard**.
 2. Select **Extract All Links** to display the cleaned, deduplicated URLs.
 3. Open **Settings** to configure matching, cleanup, language, theme, and connectivity checks.
+
+To extract from selected text on a webpage, enable **Settings → More → Right-click menu**. Select text, right-click, and choose **Extract links with LinkFlow**.
 
 ### Connectivity checks and permissions
 
@@ -75,6 +80,8 @@ LinkFlow stores preferences in the browser's local storage. It does not send pas
 | `manifest.json` | WebExtension Manifest V3 metadata and permissions |
 | `popup.html`, `popup.js` | Popup interface and URL extraction/checking |
 | `settings.html`, `settings.js` | Preferences and configuration |
+| `background.js` | Selection context-menu registration and handling |
+| `manifest.firefox.json`, `build-firefox.mjs` | Firefox-compatible manifest and packaging helper |
 | `theme.js`, `i18n.js` | Shared theme and localization helpers |
 | `locales/` | Interface translations; `supplemental.json` contains translations that extend incomplete locale packs |
 | `_locales/` | Browser-managed extension name and description translations |

@@ -14,9 +14,17 @@
   const SESSION_MARKER_KEY = 'linkflow.popupSessionStarted';
   const HISTORY_SETTINGS_KEY = 'linkflow.historySettings';
   const HISTORY_STORAGE_KEY = 'linkflow.extractionHistory';
+  const CONTEXT_MENU_SELECTION_KEY = 'linkflow.contextMenuSelection';
   const popupState = { input: '', links: [], emptyMessageKey: 'popup.emptyWaiting' };
 
   await preparePopupState();
+  const contextMenuSelection = await consumeContextMenuSelection();
+  if (contextMenuSelection) {
+    popupState.input = contextMenuSelection;
+    popupState.links = [];
+    popupState.emptyMessageKey = 'popup.emptyWaiting';
+    savePopupState();
+  }
   rawInput.value = popupState.input;
   if (popupState.links.length > 0) {
     const connectivitySettings = getConnectivitySettings();
@@ -116,6 +124,8 @@
     }
   });
 
+  if (contextMenuSelection) extractBtn.click();
+
   function renderLinks(links, connectivityEnabled) {
     linksContainer.textContent = '';
     resultCount.textContent = I18N.t('popup.resultCount', { count: links.length });
@@ -200,6 +210,27 @@
   function getContentRetention() {
     const setting = localStorage.getItem('linkflow.contentRetention');
     return ['never', 'browser', 'after-use'].includes(setting) ? setting : 'browser';
+  }
+
+  function consumeContextMenuSelection() {
+    const storage = globalThis.chrome?.storage?.local || globalThis.browser?.storage?.local;
+    if (!storage?.get || !storage?.remove) return Promise.resolve('');
+    return new Promise(resolve => {
+      try {
+        storage.get(CONTEXT_MENU_SELECTION_KEY, result => {
+          void globalThis.chrome?.runtime?.lastError;
+          const selection = typeof result?.[CONTEXT_MENU_SELECTION_KEY] === 'string'
+            ? result[CONTEXT_MENU_SELECTION_KEY]
+            : '';
+          storage.remove(CONTEXT_MENU_SELECTION_KEY, () => {
+            void globalThis.chrome?.runtime?.lastError;
+            resolve(selection.trim());
+          });
+        });
+      } catch {
+        resolve('');
+      }
+    });
   }
 
   function recordExtractionHistory(links) {

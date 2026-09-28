@@ -15,6 +15,7 @@
 - **文本清理：** 按需移除 Unicode 字符范围，并可在匹配前清除选定的括号、尖括号、大括号、书名号及引号和其中内容。
 - **连通性测试：** 可选测试提取出的链接并显示连接状态，同时设置最大并发数。启用该功能时，扩展才会请求访问所有 HTTP/HTTPS 网站的可选权限。
 - **弹窗内容保留：** 可选择保留原始输入和提取结果、关闭浏览器后删除，或每次使用后删除。
+- **右键提取：** 可选启用选中文本的右键菜单，打开 LinkFlow 并立即提取其中的链接。
 - **剪贴板输入：** 在弹窗中直接读取剪贴板文本。
 - **主题和多语言：** 支持 15 种界面语言，以及浅色、深色和跟随浏览器的自动主题。
 - **隐私优先：** 匹配和清理在本地完成。连通性测试会请求你选择测试的链接；输入文本和链接不会上传到 LinkFlow 服务器。
@@ -36,9 +37,11 @@
 
 可从 [Firefox 附加组件商店](https://addons.mozilla.org/zh-CN/firefox/addon/%E6%B8%85%E9%93%BE%E5%8A%A9%E6%89%8B/)安装已发布的版本，也可按以下步骤临时载入。
 
+Firefox 使用独立的 Manifest V3 后台脚本格式。安装 Node.js 后，在仓库目录运行 `node build-firefox.mjs`，再加载生成的 `.build/firefox/manifest.json`。
+
 1. 打开 `about:debugging#/runtime/this-firefox`。
 2. 点击**临时载入附加组件…**。
-3. 选择仓库中的 `manifest.json` 文件。
+3. 选择 `.build/firefox/manifest.json`。
 
 Firefox 安卓版可在设备支持时从 [Firefox 附加组件商店](https://addons.mozilla.org/)安装已发布的扩展。
 
@@ -47,6 +50,8 @@ Firefox 安卓版可在设备支持时从 [Firefox 附加组件商店](https://a
 1. 打开清链助手，粘贴文本或点击**读取剪贴板**。
 2. 点击**提取全部链接**，查看清理和去重后的结果。
 3. 打开**设置**，配置匹配规则、字符清理、语言、主题和连通性测试。
+
+如需从网页选中文本中提取链接，请先在**设置 → 更多 → 右键菜单**中启用功能。之后选中文本并右键点击，选择**用 LinkFlow 提取链接**即可。
 
 ### 连通性测试与权限
 
@@ -75,6 +80,8 @@ Firefox 安卓版可在设备支持时从 [Firefox 附加组件商店](https://a
 | `manifest.json` | WebExtension Manifest V3 元数据和权限 |
 | `popup.html`、`popup.js` | 弹窗界面、链接提取和测试 |
 | `settings.html`、`settings.js` | 设置和偏好配置 |
+| `background.js` | 选中文本右键菜单的注册和处理 |
+| `manifest.firefox.json`、`build-firefox.mjs` | Firefox 兼容清单及打包脚本 |
 | `theme.js`、`i18n.js` | 主题与国际化共享逻辑 |
 | `locales/` | 界面翻译文件；`supplemental.json` 用于补齐各语言包缺失的翻译 |
 | `_locales/` | 浏览器扩展名称和描述翻译 |

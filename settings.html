@@ -1123,7 +1123,7 @@
       <p class="side-caption" data-i18n="settings.menuCaption">设置</p>
       <nav class="side-nav" data-i18n-aria="settings.sectionsLabel" aria-label="设置栏目">
         <button class="nav-item" type="button" data-section="general" aria-current="page"><span class="nav-icon" aria-hidden="true">⚙</span><span data-i18n="settings.navGeneral">通用</span></button>
-        <button class="nav-item" type="button" data-section="language"><span class="nav-icon" aria-hidden="true">文</span><span data-i18n="settings.navLanguage">语言</span></button>
+        <button class="nav-item" type="button" data-section="language"><span class="nav-icon" aria-hidden="true">A</span><span data-i18n="settings.navLanguage">语言</span></button>
         <button class="nav-item" type="button" data-section="test"><span class="nav-icon" aria-hidden="true">＋</span><span data-i18n="settings.navMore">更多</span></button>
         <button class="nav-item" type="button" data-section="about"><span class="nav-icon" aria-hidden="true">ⓘ</span><span data-i18n="settings.navAbout">关于</span></button>
       </nav>
@@ -1273,6 +1273,18 @@
             </div>
             <p class="test-permission-note" data-i18n="settings.connectivityPermission">启用时浏览器会请求访问 HTTP/HTTPS 网站的可选权限；关闭功能后不会发送测试请求。</p>
             <p id="connectivitySettingsMessage" class="message" role="status" aria-live="polite"></p>
+          </section>
+
+          <section class="setting-block">
+            <h2 class="setting-block-title" data-i18n="settings.contextMenuTitle">右键菜单</h2>
+            <div class="test-setting-row">
+              <div class="test-setting-copy">
+                <strong data-i18n="settings.contextMenuEnable">启用右键菜单</strong>
+                <span data-i18n="settings.contextMenuDesc">选中文本后，使用右键菜单立即提取其中的链接。</span>
+              </div>
+              <input id="contextMenuEnabled" type="checkbox" data-i18n-aria="settings.contextMenuEnable" aria-label="启用右键菜单">
+            </div>
+            <p id="contextMenuSettingsMessage" class="message" role="status" aria-live="polite"></p>
           </section>
 
           <section class="setting-block">

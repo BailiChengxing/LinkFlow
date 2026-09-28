@@ -6,6 +6,8 @@
   const RETENTION_STORAGE_KEY = 'linkflow.contentRetention';
   const HISTORY_SETTINGS_KEY = 'linkflow.historySettings';
   const HISTORY_STORAGE_KEY = 'linkflow.extractionHistory';
+  const CONTEXT_MENU_ENABLED_KEY = 'linkflow.contextMenuEnabled';
+  const CONTEXT_MENU_TITLE_KEY = 'linkflow.contextMenuTitle';
   const HISTORY_PAGE_SIZE = 10;
   const DEFAULT_PATTERN = "(?:https?:\\/\\/)?(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\\.)+[a-z]{2,}(?::\\d{1,5})?(?:[/?#][^\\s<>\"'{}|\\\\^`\\[\\]]*)?";
   const DEFAULT_FLAGS = 'gi';
@@ -32,6 +34,8 @@
   const connectivityEnabled = document.getElementById('connectivityEnabled');
   const connectivityConcurrency = document.getElementById('connectivityConcurrency');
   const connectivitySettingsMessage = document.getElementById('connectivitySettingsMessage');
+  const contextMenuEnabled = document.getElementById('contextMenuEnabled');
+  const contextMenuSettingsMessage = document.getElementById('contextMenuSettingsMessage');
   const contentRetention = document.getElementById('contentRetention');
   const retentionSettingsMessage = document.getElementById('retentionSettingsMessage');
   const historyEnabled = document.getElementById('historyEnabled');
@@ -72,6 +76,7 @@
     loadNoiseRules();
     loadBracketOptions();
     loadConnectivitySettings();
+    await loadContextMenuSettings();
     loadRetentionSettings();
     loadHistorySettings();
     renderHistory();
@@ -298,6 +303,57 @@
     showMessage(retentionSettingsMessage, I18N.t('settings.retentionSaved'));
   }
 
+  function getExtensionLocalStorage() {
+    return globalThis.chrome?.storage?.local || globalThis.browser?.storage?.local;
+  }
+
+  function extensionStorageGet(keys) {
+    const storage = getExtensionLocalStorage();
+    if (!storage?.get) return Promise.resolve({});
+    return new Promise(resolve => {
+      try {
+        storage.get(keys, result => {
+          void globalThis.chrome?.runtime?.lastError;
+          resolve(result || {});
+        });
+      } catch {
+        resolve({});
+      }
+    });
+  }
+
+  function extensionStorageSet(values) {
+    const storage = getExtensionLocalStorage();
+    if (!storage?.set) return Promise.resolve();
+    return new Promise(resolve => {
+      try {
+        storage.set(values, () => {
+          void globalThis.chrome?.runtime?.lastError;
+          resolve();
+        });
+      } catch {
+        resolve();
+      }
+    });
+  }
+
+  async function loadContextMenuSettings() {
+    const values = await extensionStorageGet([CONTEXT_MENU_ENABLED_KEY]);
+    contextMenuEnabled.checked = values[CONTEXT_MENU_ENABLED_KEY] === true;
+    await persistContextMenuSettings(false);
+  }
+
+  async function persistContextMenuSettings(showSavedMessage = true) {
+    const title = I18N.t('settings.contextMenuItem');
+    await extensionStorageSet({
+      [CONTEXT_MENU_ENABLED_KEY]: contextMenuEnabled.checked,
+      [CONTEXT_MENU_TITLE_KEY]: title
+    });
+    if (showSavedMessage) {
+      showMessage(contextMenuSettingsMessage, I18N.t('settings.contextMenuSaved'));
+    }
+  }
+
   function getHistorySettings() {
     try {
       const saved = JSON.parse(localStorage.getItem(HISTORY_SETTINGS_KEY) || 'null');
@@ -514,8 +570,10 @@
     updatePresetOptions();
     showMessage(message, '');
     showMessage(connectivitySettingsMessage, '');
+    showMessage(contextMenuSettingsMessage, '');
     showMessage(historySettingsMessage, '');
     renderHistory();
+    await persistContextMenuSettings(false);
   });
 
   themeSelect.addEventListener('change', () => {
@@ -532,6 +590,10 @@
 
   connectivityConcurrency.addEventListener('change', () => {
     saveConnectivitySettings();
+  });
+
+  contextMenuEnabled.addEventListener('change', () => {
+    void persistContextMenuSettings();
   });
 
   contentRetention.addEventListener('change', saveRetentionSettings);
